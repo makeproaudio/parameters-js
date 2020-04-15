@@ -1,0 +1,53 @@
+{
+  "name": "@makeproaudio/parameters-js",
+  "version": "1.0.0",
+  "description": "A generic real-time values synchronisation framework",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/makeproaudio/parameters-js.git"
+  },
+  "author": "MakeProAudio GmbH",
+  "license": "AGPL",
+  "bugs": {
+    "url": "https://github.com/makeproaudio/parameters-js/issues"
+  },
+  "homepage": "https://github.com/makeproaudio/parameters-js#readme",
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^11.0.2",
+    "@rollup/plugin-typescript": "^3.0.0",
+    "@types/chai": "^4.2.7",
+    "@types/ini": "^1.3.30",
+    "@types/mocha": "^5.2.7",
+    "@types/node": "^12.12.6",
+    "chai": "^4.2.0",
+    "gts": "^1.1.0",
+    "mocha": "^6.2.2",
+    "nodemon": "^1.19.4",
+    "rollup": "^1.31.1",
+    "rollup-plugin-typescript2": "^0.27.0",
+    "ts-node": "^8.5.4",
+    "tslint": "^5.20.1",
+    "typescript": "^3.7.2"
+  },
+  "main": "dist/index.js",
+  "module": "dist/index.es.js",
+  "files": [
+    "dist"
+  ],
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "check": "gts check",
+    "clean": "gts clean",
+    "compile": "tsc -p .",
+    "fix": "gts fix",
+    "prepare": "npm run build",
+    "pretest": "npm run build",
+    "posttest": "npm run check",
+    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
+    "lint": "tslint -p tsconfig.json",
+    "build": "rollup -c"
+  },
+  "dependencies": {
+    "rxjs": "^6.5.4"
+  }
+}
