@@ -1,11 +1,17 @@
 {
   "name": "@makeproaudio/parameters-js",
-  "version": "1.0.0",
+  "version": "1.0.0-beta.0",
   "description": "A generic real-time values synchronisation framework",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/makeproaudio/parameters-js.git"
   },
+  "keywords": [
+    "async",
+    "rxjs",
+    "value",
+    "parameter"
+  ],
   "author": "MakeProAudio GmbH",
   "license": "AGPL",
   "bugs": {
