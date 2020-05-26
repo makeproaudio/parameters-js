@@ -4,6 +4,9 @@ import { Parameter, ParameterChangeEvent } from './parameter';
 the synapse to make an update*/
 export class Synapse {
   _value: any;
+
+
+  /* */
   private _metadata: Map<string, any>;
   private _bound: Map<Parameter<any>, ((parameterChangeEvent: ParameterChangeEvent<any>) => void)[]>;
   constructor(param: Parameter<any>, initValue: any) {

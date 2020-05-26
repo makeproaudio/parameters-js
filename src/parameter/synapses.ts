@@ -1,6 +1,7 @@
 import { Parameter } from './parameter';
 import { Synapse } from './synapse';
 
+/* A simple registry mechanism used only internally to manage Synapses. */
 class SynapsesManager {
   _syanpses = new Map<Parameter<any>, Synapse>();
   constructor() {

@@ -66,9 +66,8 @@ class ParametersRegistry {
     return param;
   };
 
-  // tslint:disable-next-line: no-any
+  /* Gets one or more parameters with a matching id without caring about the namespace from the registry's live map of Parameters */
   getDisregardingNamespace = (id: string): Array<Parameter<any>> => {
-    // tslint:disable-next-line: no-any
     const ret = new Array<Parameter<any>>();
     this.params.forEach((value, key) => {
       if (key.split(this.delimiter)[1] === id) {
@@ -78,9 +77,10 @@ class ParametersRegistry {
     return ret;
   };
 
-  // tslint:disable-next-line: no-any
+  /* Gets the exact parameter with a matching id and namespace from the registry's live map of Parameters */
   getExact = (namespace: string, id: string): Parameter<any> | undefined => this.params.get(this.qualifiedName(namespace, id));
 
+  /* subscribe to parameters that can be created latently based on the filtration criteria */
   subscribe = (
     id: string,
     next?: ((value: Parameter<any>) => void) | undefined,
@@ -91,6 +91,7 @@ class ParametersRegistry {
     filtered.subscribe(next, error, complete);
   };
 
+  /* A variation of subscribe where the filtration criteria accepts a prefix for the id of the parameter */
   subscribeLoose = (
     prefix: string,
     next?: ((value: Parameter<any>) => void) | undefined,
@@ -109,6 +110,8 @@ class ParametersRegistry {
   };
 }
 
+/* Once the SuperParameter came into existence, the classical Parameter types have been deemed to be for internal
+ * use only. Hence the only export from the Parameter Registry is the creation process of a SuperParameter.*/
 const Parameters: ParametersRegistry = new ParametersRegistry();
 // export const newBooleanParameter = Parameters.booleanParameter;
 // export const newStringParameter = Parameters.stringParameter;

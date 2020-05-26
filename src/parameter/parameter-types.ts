@@ -51,7 +51,10 @@ export class BooleanParameter extends Parameter<boolean> {
   }
 }
 
+/* The Super Parameter works on a few pre-defined conventions*/
 export class SuperParameter extends Parameter<any> {
+  /* All of the properties below are "possibly" undefined, because depending on the arguments
+   * supplied at the time of updating the parameter type, the SuperParameter may behave differently. */
   private min: number | undefined;
   private max: number | undefined;
   private step: number | undefined;
@@ -78,6 +81,9 @@ export class SuperParameter extends Parameter<any> {
     return this.possibleValues;
   }
 
+  /* By default, a freshly constructed SuperParameter will be of type boolean. This is done to 
+  * channel the type updation of a SuperParameter through the TypeChangeRequest only and to keep
+  the process of creation simplistic ƒ*/
   constructor(id: string) {
     super(false, id);
     this.type = SuperParameterType.BOOLEAN;
@@ -91,6 +97,8 @@ export class SuperParameter extends Parameter<any> {
     return typesValid;
   }
 
+  /* There are several constraints to be supplied when attempting to update the type of a SuperParameter
+   * This is captured here in this method*/
   private validateParameterTypeChangeRequest(req: SuperParameterTypeChangeRequest): boolean {
     switch (req.type) {
       case SuperParameterType.BOOLEAN:
@@ -137,6 +145,8 @@ export class SuperParameter extends Parameter<any> {
     }
   }
 
+  /* For a SuperParameter, updating the type enjoys the rights of a first-class citizen.
+   * A standard usage would encompass creating a SuperParameter and then immediately updating its type */
   updateType(req: SuperParameterTypeChangeRequest) {
     if (!this.validateParameterTypeChangeRequest(req)) throw new Error('cannot update type due to validation failure');
     if (req.type === SuperParameterType.NUMBER) this.setMinMaxStep(req.min!, req.max!, req.step!, req.value);
@@ -186,6 +196,8 @@ export class SuperParameter extends Parameter<any> {
     return this.update(value);
   }
 
+  /* The SuperParameter ecosystem provides more convenient ways to update the value of a Parameter.
+   * Depending on the current type of the Parameter, updateCyclic could do one of several things */
   updateCyclic(): any {
     if (this.type === SuperParameterType.STRING) this.update(this.value(), true);
     if ((this.type === SuperParameterType.NUMBER_ARRAY || this.type === SuperParameterType.STRING_ARRAY) && this.possibleValues) {
@@ -226,6 +238,7 @@ export class SuperParameter extends Parameter<any> {
     if (this.type === SuperParameterType.NUMBER) this.update(Math.round((this.value() as number) - this.step! * jumps));
   }
 
+  /* This overrides the standard update method of the Parameter by adding a few checks before making the update */
   update(newVal: string | boolean | number, forceListenerUpdate?: boolean): any {
     if (this.type === SuperParameterType.NUMBER) {
       let valToSend: number;

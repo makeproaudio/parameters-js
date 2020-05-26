@@ -1,5 +1,7 @@
 import { Synapses } from './synapses';
 
+/* As seen over here, the Parameter does not hold the Metadata or the Value. The Synapse is responsible for that
+ */
 export abstract class Parameter<T> {
   private _id: string;
   private _self: (callback: ParameterChangeEvent<T>) => void;
