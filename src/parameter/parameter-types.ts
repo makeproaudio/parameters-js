@@ -1,6 +1,6 @@
 import { Parameter } from './parameter';
 
-export class IntegerParameter extends Parameter<number> {
+export class NumberParameter extends Parameter<number> {
   private min: number;
   private max: number;
 

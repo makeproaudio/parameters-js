@@ -1,5 +1,5 @@
 import { Parameter } from './parameter';
-import { IntegerParameter, StringParameter, IntegerArrayParameter, StringArrayParameter, BooleanParameter, SuperParameter } from './parameter-types';
+import { NumberParameter, StringParameter, IntegerArrayParameter, StringArrayParameter, BooleanParameter, SuperParameter } from './parameter-types';
 import { ReplaySubject } from 'rxjs';
 import { filter } from 'rxjs/operators';
 
@@ -18,15 +18,15 @@ class ParametersRegistry {
     return namespace.concat(this.delimiter).concat(id);
   };
 
-  integerParameter = (init: number, min: number, max: number, namespace: string, id: string): IntegerParameter => {
+  numberParameter = (init: number, min: number, max: number, namespace: string, id: string): NumberParameter => {
     const qualifiedName = this.qualifiedName(namespace, id);
-    const param = new IntegerParameter(init, min, max, this.qualifiedName(namespace, id));
+    const param = new NumberParameter(init, min, max, this.qualifiedName(namespace, id));
     this.params.set(qualifiedName, param);
     this._stream.next(param);
     return param;
   };
 
-  integerArrayParameter = (init: number, possible: number[], namespace: string, id: string): IntegerArrayParameter => {
+  numberArrayParameter = (init: number, possible: number[], namespace: string, id: string): IntegerArrayParameter => {
     const qualifiedName = this.qualifiedName(namespace, id);
     const param = new IntegerArrayParameter(init, possible, this.qualifiedName(namespace, id));
     this.params.set(qualifiedName, param);
