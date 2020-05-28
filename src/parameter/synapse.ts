@@ -24,6 +24,10 @@ export class Synapse {
     this._bound.set(param, callbacks);
   }
 
+  remove(param:Parameter<any>){
+    
+  }
+
   update(value: any, forceListenerUpdate?: boolean): any {
     if (forceListenerUpdate !== true) if (value === this._value) return this._value;
     this._value = value;

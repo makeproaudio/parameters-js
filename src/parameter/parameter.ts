@@ -5,9 +5,11 @@ import { Synapses } from './synapses';
 export abstract class Parameter<T> {
   private _id: string;
   private _self: (callback: ParameterChangeEvent<T>) => void;
+  private _listeners: ((callback: ParameterChangeEvent<T>) => void)[];
   constructor(initValue: T, id: string) {
     this._id = id;
     this._self = this._self_;
+    this._listeners = [];
     Synapses.create(this, initValue).add(this, this._self);
   }
 
@@ -26,7 +28,11 @@ export abstract class Parameter<T> {
 
   private doUpdate(newValue: T, forceListenerUpdate?: boolean): T {
     const dest = Synapses.of(this);
-    return dest.update(newValue, forceListenerUpdate);
+    const updatedValue = dest.update(newValue, forceListenerUpdate);
+    this._listeners.forEach(l => {
+      l({ value: updatedValue, parameter: this });
+    });
+    return updatedValue;
   }
 
   setMetadata(key: string, value: any) {
@@ -53,18 +59,23 @@ export abstract class Parameter<T> {
     return this.doUpdate(newValue, forceListenerUpdate);
   }
 
-  bindFrom(parameter: Parameter<T>, callback: (parameterChangeEvent: ParameterChangeEvent<T>) => void) {
+  bindFrom(other: Parameter<T>, callback: (parameterChangeEvent: ParameterChangeEvent<T>) => void) {
     try {
-      const dest = Synapses.of(parameter);
-      Synapses.set(this, dest);
+      const dest = Synapses.of(other);
       dest.add(this, callback);
+      Synapses.set(this, dest);
     } catch (ex) {}
     /* set new value to incoming parameter immediately */
   }
 
   addListener(callback: (parameterChangeEvent: ParameterChangeEvent<T>) => void) {
-    const dest = Synapses.of(this);
-    dest.add(this, callback);
+    // const dest = Synapses.of(this);
+    // dest.add(this, callback);
+    this._listeners.push(callback);
+  }
+
+  removeListener(callback: (parameterChangeEvent: ParameterChangeEvent<T>) => void) {
+    this._listeners.splice(this._listeners.indexOf(callback), 1);
   }
 }
 

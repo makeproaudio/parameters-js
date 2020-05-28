@@ -7,16 +7,16 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Parameters",
+      "name": "Binding",
       "args": [],
-      "program": "${workspaceFolder}/dist/index.js"
+      "program": "${workspaceFolder}/examples/bind.js"
     },
     {
       "type": "node",
       "request": "launch",
-      "name": "Tablet",
-      "args": ["--device", "tablet"],
-      "program": "${workspaceFolder}/dist/index.js"
+      "name": "Listeners",
+      "args": [],
+      "program": "${workspaceFolder}/examples/listener.js"
     },
     {
       "type": "node",
