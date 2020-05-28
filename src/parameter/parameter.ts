@@ -40,6 +40,7 @@ export abstract class Parameter<T> {
     const dest = Synapses.of(this);
     const updatedValue = dest.update(newValue, forceListenerUpdate);
     this._listeners.forEach(l => {
+      l.bind(this);
       l({ value: updatedValue, parameter: this });
     });
     return updatedValue;
@@ -48,11 +49,19 @@ export abstract class Parameter<T> {
   setMetadata(key: string, value: any) {
     const dest = Synapses.of(this);
     dest.setMetadata(key, value);
+    this._listeners.forEach(l => {
+      const boundCallback = l.bind(this);
+      boundCallback!({ metadataUpdated: { key, value }, parameter: this });
+    });
   }
 
   setMetadataSeveral(token: string, key: string[], value: any[]) {
     const dest = Synapses.of(this);
     dest.setMetadataSeveral(token, key, value);
+    this._listeners.forEach(l => {
+      const boundCallback = l.bind(this);
+      boundCallback!({ metadataUpdated: { key: token, value: true }, parameter: this });
+    });
   }
 
   removeMetadata(key: string) {
