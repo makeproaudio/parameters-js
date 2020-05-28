@@ -7,9 +7,16 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Binding",
+      "name": "Bind - Same",
       "args": [],
-      "program": "${workspaceFolder}/examples/bind.js"
+      "program": "${workspaceFolder}/examples/bind-same-synapse.js"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Bind - Diff",
+      "args": [],
+      "program": "${workspaceFolder}/examples/bind-diff-synapse.js"
     },
     {
       "type": "node",

@@ -1,16 +1,26 @@
 import { Synapses } from './synapses';
+import { Synapse } from './synapse';
 
 /* As seen over here, the Parameter does not hold the Metadata or the Value. The Synapse is responsible for that
  */
 export abstract class Parameter<T> {
   private _id: string;
   private _self: (callback: ParameterChangeEvent<T>) => void;
+  private _default: Synapse;
   private _listeners: ((callback: ParameterChangeEvent<T>) => void)[];
+  private _bound: boolean;
+
   constructor(initValue: T, id: string) {
     this._id = id;
     this._self = this._self_;
     this._listeners = [];
-    Synapses.create(this, initValue).add(this, this._self);
+    this._default = Synapses.create(this, initValue);
+    this._default.set(this, this._self);
+    this._bound = false;
+  }
+
+  __default__(): Synapse {
+    return this._default;
   }
 
   private _self_(callback: ParameterChangeEvent<T>) {
@@ -59,13 +69,47 @@ export abstract class Parameter<T> {
     return this.doUpdate(newValue, forceListenerUpdate);
   }
 
+  bound(): boolean {
+    return this._bound;
+  }
+
+  __acquire__(): void {
+    this._bound = true;
+  }
+
+  __release__(): void {
+    this._bound = false;
+  }
+
   bindFrom(other: Parameter<T>, callback: (parameterChangeEvent: ParameterChangeEvent<T>) => void) {
-    try {
-      const dest = Synapses.of(other);
-      dest.add(this, callback);
-      Synapses.set(this, dest);
-    } catch (ex) {}
+    if (!this.bound()) {
+      try {
+        const dest = Synapses.of(other);
+        dest.set(this, callback);
+        Synapses.set(this, dest);
+        this.__acquire__();
+        other.__acquire__();
+      } catch (ex) {
+        console.log(ex);
+      }
+    } else {
+      console.log(`${this.id()} is already bound to another Synapse`);
+    }
     /* set new value to incoming parameter immediately */
+  }
+
+  unbind() {
+    try {
+      const me: Synapse = Synapses.of(this);
+      me.unset(this);
+      Synapses.set(this, this._default);
+      this.__release__();
+
+      const lonely = me.lonely();
+      if (lonely) lonely.unbind();
+    } catch (ex) {
+      console.log(ex);
+    }
   }
 
   addListener(callback: (parameterChangeEvent: ParameterChangeEvent<T>) => void) {

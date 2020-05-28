@@ -25,6 +25,7 @@
     "@types/ini": "^1.3.30",
     "@types/mocha": "^5.2.7",
     "@types/node": "^12.12.6",
+    "@types/uuid": "^8.0.0",
     "chai": "^4.2.0",
     "gts": "^1.1.0",
     "mocha": "^6.2.2",
@@ -54,6 +55,7 @@
     "build": "rollup -c"
   },
   "dependencies": {
-    "rxjs": "^6.5.4"
+    "rxjs": "^6.5.4",
+    "uuid": "^8.1.0"
   }
 }
