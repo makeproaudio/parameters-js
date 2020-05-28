@@ -28,6 +28,13 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Metadata",
+      "args": [],
+      "program": "${workspaceFolder}/examples/metadata.js"
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Mocha Current File",
       "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
       "args": ["--timeout", "999999", "--colors", "${file}"],
