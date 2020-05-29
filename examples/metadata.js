@@ -1,6 +1,7 @@
 const { Parameters, ParameterType } = require('..');
 const p1 = Parameters.newParameter('', 'p1');
 p1.updateType({ type: ParameterType.NUMBER, min: 100, max: 200, step: 1, value: 150 });
+p1.setMetadata('non-classified-key', 'non-classified-value');
 
 p1.addListener(e => {
   if (e.value) console.log(`p1L: ${JSON.stringify(e.value)}`);

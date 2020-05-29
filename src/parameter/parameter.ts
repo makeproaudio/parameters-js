@@ -55,13 +55,15 @@ export abstract class Parameter<T> {
     });
   }
 
-  setMetadataSeveral(token: string, key: string[], value: any[]) {
+  setMetadataSeveral(token: string, key: string[], value: any[], secretly?: boolean) {
     const dest = Synapses.of(this);
-    dest.setMetadataSeveral(token, key, value);
-    this._listeners.forEach(l => {
-      const boundCallback = l.bind(this);
-      boundCallback!({ metadataUpdated: { key: token, value: true }, parameter: this });
-    });
+    dest.setMetadataSeveral(token, key, value, secretly);
+    if (!secretly) {
+      this._listeners.forEach(l => {
+        const boundCallback = l.bind(this);
+        boundCallback!({ metadataUpdated: { key: token, value: true }, parameter: this });
+      });
+    }
   }
 
   removeMetadata(key: string) {
@@ -72,6 +74,11 @@ export abstract class Parameter<T> {
   getMetadata(key: string) {
     const dest = Synapses.of(this);
     return dest.getMetadata(key);
+  }
+
+  getAllMetadata(): Map<string, any> {
+    const dest = Synapses.of(this);
+    return dest.getAllMetadata();
   }
 
   update(newValue: T, forceListenerUpdate?: boolean): T {

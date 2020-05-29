@@ -60,6 +60,7 @@ export class SuperParameter extends Parameter<any> {
   private step: number | undefined;
   private type: SuperParameterType;
   private possibleValues: any[] | undefined;
+  private classifiedMetadata = ['type', 'min', 'max', 'step', 'values'];
 
   getMin(): number | undefined {
     return this.min;
@@ -177,13 +178,7 @@ export class SuperParameter extends Parameter<any> {
     this.step = step;
     this.type = SuperParameterType.NUMBER;
     this.possibleValues = undefined;
-    if (secretly !== undefined && secretly === true) {
-      this.setMetadataSeveral(
-        SuperParameterTypeChangeRequestToken,
-        ['type', 'min', 'max', 'step', 'values'],
-        [this.type, this.min, this.max, this.step, undefined]
-      );
-    }
+    this.setMetadataSeveral(SuperParameterTypeChangeRequestToken, this.classifiedMetadata, [this.type, this.min, this.max, this.step, undefined], secretly);
     return this.update(value);
   }
 
@@ -193,13 +188,12 @@ export class SuperParameter extends Parameter<any> {
     if (typeof values[0] === 'number') this.type = SuperParameterType.NUMBER_ARRAY;
     else if (typeof values[0] === 'string') this.type = SuperParameterType.STRING_ARRAY;
     this.min = this.max = this.step = undefined;
-    if (secretly !== undefined && secretly === true) {
-      this.setMetadataSeveral(
-        SuperParameterTypeChangeRequestToken,
-        ['type', 'min', 'max', 'step', 'values'],
-        [this.type, undefined, undefined, undefined, this.possibleValues]
-      );
-    }
+    this.setMetadataSeveral(
+      SuperParameterTypeChangeRequestToken,
+      this.classifiedMetadata,
+      [this.type, undefined, undefined, undefined, this.possibleValues],
+      secretly
+    );
     return this.update(value);
   }
 
@@ -207,13 +201,7 @@ export class SuperParameter extends Parameter<any> {
     if (typeof value === 'string') this.type = SuperParameterType.STRING;
     else if (typeof value === 'boolean') this.type = SuperParameterType.BOOLEAN;
     this.min = this.max = this.step = this.possibleValues = undefined;
-    if (secretly !== undefined && secretly === true) {
-      this.setMetadataSeveral(
-        SuperParameterTypeChangeRequestToken,
-        ['type', 'min', 'max', 'step', 'values'],
-        [this.type, undefined, undefined, undefined, undefined]
-      );
-    }
+    this.setMetadataSeveral(SuperParameterTypeChangeRequestToken, this.classifiedMetadata, [this.type, undefined, undefined, undefined, undefined], secretly);
     return this.update(value);
   }
 
@@ -297,9 +285,21 @@ export class SuperParameter extends Parameter<any> {
     this.updateType(other.getBlueprint(), true);
     try {
       super.bindFrom(other, callback);
+      const nonClassifiedMetadata = this.nonClassifiedMetadata(other);
+      const classifiedKeys = Array.from(nonClassifiedMetadata.keys());
+      const classifiedValues = Array.from(nonClassifiedMetadata.values());
+      this.setMetadataSeveral(SecretMetadataCopy, classifiedKeys, classifiedValues, true);
     } catch (err) {
       this.updateType(currBlueprint, true);
     }
+  }
+
+  nonClassifiedMetadata(param: SuperParameter): Map<string, any> {
+    const ret = new Map<string, any>();
+    param.getAllMetadata().forEach((v, k) => {
+      if (!this.classifiedMetadata.includes(k)) ret.set(k, v);
+    });
+    return ret;
   }
 }
 
@@ -313,6 +313,7 @@ export interface SuperParameterBlueprint {
 }
 
 export const SuperParameterTypeChangeRequestToken = 'typechangerequest';
+const SecretMetadataCopy = 'secretmetadatacopy';
 
 export enum SuperParameterType {
   NUMBER = 'NUMBER',

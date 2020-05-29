@@ -61,6 +61,10 @@ export class Synapse {
     return this._metadata.get(key);
   }
 
+  getAllMetadata(): Map<string, any> {
+    return this._metadata;
+  }
+
   setMetadata(key: string, value: any) {
     this._metadata.set(key, value);
     this._bound.forEach((callback, p) => {
@@ -69,15 +73,17 @@ export class Synapse {
     });
   }
 
-  setMetadataSeveral(token: string, keys: string[], values: any[]) {
+  setMetadataSeveral(token: string, keys: string[], values: any[], secretly?: boolean) {
     if (keys.length != values.length) throw Error('while updating several metadata, length of keys and values array should be the same');
     for (let i = 0; i < keys.length; i++) {
       this._metadata.set(keys[i], values[i]);
     }
-    this._bound.forEach((callback, p) => {
-      const boundCallback = callback.bind(p);
-      boundCallback!({ metadataUpdated: { key: token, value: true }, parameter: p });
-    });
+    if (!secretly) {
+      this._bound.forEach((callback, p) => {
+        const boundCallback = callback.bind(p);
+        boundCallback!({ metadataUpdated: { key: token, value: true }, parameter: p });
+      });
+    }
   }
 
   removeMetadata(key: string) {
