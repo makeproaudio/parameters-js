@@ -1,4 +1,4 @@
-import { Parameter } from './parameter';
+import { Parameter, ParameterChangeEvent } from './parameter';
 
 export class NumberParameter extends Parameter<number> {
   private min: number;
@@ -81,6 +81,23 @@ export class SuperParameter extends Parameter<any> {
     return this.possibleValues;
   }
 
+  getBlueprint(): SuperParameterBlueprint {
+    switch (this.type) {
+      case SuperParameterType.BOOLEAN:
+        return { type: this.type, value: this.value() };
+      case SuperParameterType.NUMBER:
+        return { type: this.type, max: this.max, min: this.min, step: this.step, value: this.value() };
+      case SuperParameterType.NUMBER_ARRAY:
+        return { type: this.type, values: this.possibleValues, value: this.value() };
+      case SuperParameterType.STRING:
+        return { type: this.type, value: this.value() };
+      case SuperParameterType.STRING_ARRAY:
+        return { type: this.type, values: this.possibleValues, value: this.value() };
+      default:
+        return { type: this.type, value: this.value() };
+    }
+  }
+
   /* By default, a freshly constructed SuperParameter will be of type boolean. This is done to 
   * channel the type updation of a SuperParameter through the TypeChangeRequest only and to keep
   the process of creation simplistic ƒ*/
@@ -99,7 +116,7 @@ export class SuperParameter extends Parameter<any> {
 
   /* There are several constraints to be supplied when attempting to update the type of a SuperParameter
    * This is captured here in this method*/
-  private validateParameterTypeChangeRequest(req: SuperParameterTypeChangeRequest): boolean {
+  private validateParameterTypeChangeRequest(req: SuperParameterBlueprint): boolean {
     switch (req.type) {
       case SuperParameterType.BOOLEAN:
         if (req.max === undefined && req.min === undefined && req.step === undefined && req.values === undefined) {
@@ -147,52 +164,56 @@ export class SuperParameter extends Parameter<any> {
 
   /* For a SuperParameter, updating the type enjoys the rights of a first-class citizen.
    * A standard usage would encompass creating a SuperParameter and then immediately updating its type */
-  updateType(req: SuperParameterTypeChangeRequest) {
+  updateType(req: SuperParameterBlueprint, secretly?: boolean) {
     if (!this.validateParameterTypeChangeRequest(req)) throw new Error('cannot update type due to validation failure');
-    if (req.type === SuperParameterType.NUMBER) this.setMinMaxStep(req.min!, req.max!, req.step!, req.value);
-    if (req.type === SuperParameterType.NUMBER_ARRAY || req.type === SuperParameterType.STRING_ARRAY) this.setValues(req.values!, req.value);
-    if (req.type === SuperParameterType.STRING || req.type === SuperParameterType.BOOLEAN) this.setValueSpecific(req.value);
+    if (req.type === SuperParameterType.NUMBER) this.setMinMaxStep(req.min!, req.max!, req.step!, req.value, secretly);
+    if (req.type === SuperParameterType.NUMBER_ARRAY || req.type === SuperParameterType.STRING_ARRAY) this.setValues(req.values!, req.value, secretly);
+    if (req.type === SuperParameterType.STRING || req.type === SuperParameterType.BOOLEAN) this.setValueSpecific(req.value, secretly);
   }
 
-  private setMinMaxStep(min: number, max: number, step: number, value: number): any {
+  private setMinMaxStep(min: number, max: number, step: number, value: number, secretly?: boolean): any {
     this.min = min;
     this.max = max;
     this.step = step;
     this.type = SuperParameterType.NUMBER;
     this.possibleValues = undefined;
-    this.setMetadataSeveral(
-      SuperParameterTypeChangeRequestToken,
-      ['type', 'min', 'max', 'step', 'values'],
-      [this.type, this.min, this.max, this.step, undefined]
-    );
+    if (secretly !== undefined && secretly === true) {
+      this.setMetadataSeveral(
+        SuperParameterTypeChangeRequestToken,
+        ['type', 'min', 'max', 'step', 'values'],
+        [this.type, this.min, this.max, this.step, undefined]
+      );
+    }
     return this.update(value);
   }
 
-  private setValues(values: any[], value: any): any {
+  private setValues(values: any[], value: any, secretly?: boolean): any {
     this.possibleValues = [];
     values.forEach(v => this.possibleValues!.push(v));
     if (typeof values[0] === 'number') this.type = SuperParameterType.NUMBER_ARRAY;
     else if (typeof values[0] === 'string') this.type = SuperParameterType.STRING_ARRAY;
     this.min = this.max = this.step = undefined;
-
-    this.setMetadataSeveral(
-      SuperParameterTypeChangeRequestToken,
-      ['type', 'min', 'max', 'step', 'values'],
-      [this.type, undefined, undefined, undefined, this.possibleValues]
-    );
+    if (secretly !== undefined && secretly === true) {
+      this.setMetadataSeveral(
+        SuperParameterTypeChangeRequestToken,
+        ['type', 'min', 'max', 'step', 'values'],
+        [this.type, undefined, undefined, undefined, this.possibleValues]
+      );
+    }
     return this.update(value);
   }
 
-  private setValueSpecific(value: string | boolean): any {
+  private setValueSpecific(value: string | boolean, secretly?: boolean): any {
     if (typeof value === 'string') this.type = SuperParameterType.STRING;
     else if (typeof value === 'boolean') this.type = SuperParameterType.BOOLEAN;
     this.min = this.max = this.step = this.possibleValues = undefined;
-
-    this.setMetadataSeveral(
-      SuperParameterTypeChangeRequestToken,
-      ['type', 'min', 'max', 'step', 'values'],
-      [this.type, undefined, undefined, undefined, undefined]
-    );
+    if (secretly !== undefined && secretly === true) {
+      this.setMetadataSeveral(
+        SuperParameterTypeChangeRequestToken,
+        ['type', 'min', 'max', 'step', 'values'],
+        [this.type, undefined, undefined, undefined, undefined]
+      );
+    }
     return this.update(value);
   }
 
@@ -270,9 +291,19 @@ export class SuperParameter extends Parameter<any> {
     else rounded = this.step!;
     super.update(rounded);
   }
+
+  bindFrom(other: SuperParameter, callback: (parameterChangeEvent: ParameterChangeEvent<any>) => void) {
+    const currBlueprint = this.getBlueprint();
+    this.updateType(other.getBlueprint(), true);
+    try {
+      super.bindFrom(other, callback);
+    } catch (err) {
+      this.updateType(currBlueprint, true);
+    }
+  }
 }
 
-export interface SuperParameterTypeChangeRequest {
+export interface SuperParameterBlueprint {
   type: SuperParameterType;
   min?: number;
   max?: number;
