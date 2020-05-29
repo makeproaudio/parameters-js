@@ -119,5 +119,9 @@ const Parameters: ParametersRegistry = new ParametersRegistry();
 // export const newNumberParameter = Parameters.integerParameter;
 // export const newNumberArrayParameter = Parameters.integerArrayParameter;
 export const newParameter = Parameters.superParameter;
+export const getExact = Parameters.getExact;
+export const subscribe = Parameters.subscribe;
+export const subscribeLoose = Parameters.subscribeLoose;
+export const getDisregardingNamespace = Parameters.getDisregardingNamespace;
 
 Object.freeze(Parameters);
