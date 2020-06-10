@@ -7,13 +7,13 @@ export abstract class Parameter<T> {
   private _id: string;
   private _self: (callback: ParameterChangeEvent<T>) => void;
   private _default: Synapse;
-  private _listeners: ((callback: ParameterChangeEvent<T>) => void)[];
+  __listeners__: ((callback: ParameterChangeEvent<T>) => void)[];
   private _bound: boolean;
 
   constructor(initValue: T, id: string) {
     this._id = id;
     this._self = this._self_;
-    this._listeners = [];
+    this.__listeners__ = [];
     this._default = Synapses.create(this, initValue);
     this._default.set(this, this._self);
     this._bound = false;
@@ -24,8 +24,7 @@ export abstract class Parameter<T> {
   }
 
   private _self_(callback: ParameterChangeEvent<T>) {
-    // console.log(this._id);
-    // console.log(`${param._id} self: new value is ${newValue}`);
+    // console.log(`${callback.parameter.id()} self: new value is ${callback.parameter.value()}`);
   }
 
   id(): string {
@@ -39,31 +38,17 @@ export abstract class Parameter<T> {
   private doUpdate(newValue: T, forceListenerUpdate?: boolean): T {
     const dest = Synapses.of(this);
     const updatedValue = dest.update(newValue, forceListenerUpdate);
-    this._listeners.forEach(l => {
-      l.bind(this);
-      l({ value: updatedValue, parameter: this });
-    });
     return updatedValue;
   }
 
   setMetadata(key: string, value: any) {
     const dest = Synapses.of(this);
     dest.setMetadata(key, value);
-    this._listeners.forEach(l => {
-      const boundCallback = l.bind(this);
-      boundCallback!({ metadataUpdated: { key, value }, parameter: this });
-    });
   }
 
   setMetadataSeveral(token: string, key: string[], value: any[], secretly?: boolean) {
     const dest = Synapses.of(this);
     dest.setMetadataSeveral(token, key, value, secretly);
-    if (!secretly) {
-      this._listeners.forEach(l => {
-        const boundCallback = l.bind(this);
-        boundCallback!({ metadataUpdated: { key: token, value: true }, parameter: this });
-      });
-    }
   }
 
   removeMetadata(key: string) {
@@ -131,11 +116,11 @@ export abstract class Parameter<T> {
   addListener(callback: (parameterChangeEvent: ParameterChangeEvent<T>) => void) {
     // const dest = Synapses.of(this);
     // dest.add(this, callback);
-    this._listeners.push(callback);
+    this.__listeners__.push(callback);
   }
 
   removeListener(callback: (parameterChangeEvent: ParameterChangeEvent<T>) => void) {
-    this._listeners.splice(this._listeners.indexOf(callback), 1);
+    this.__listeners__.splice(this.__listeners__.indexOf(callback), 1);
   }
 }
 

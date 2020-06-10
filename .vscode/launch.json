@@ -28,6 +28,13 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Bind-Listeners",
+      "args": [],
+      "program": "${workspaceFolder}/examples/bind-and-listener.js"
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Metadata",
       "args": [],
       "program": "${workspaceFolder}/examples/metadata.js"

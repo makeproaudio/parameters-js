@@ -50,10 +50,15 @@ export class Synapse {
       try {
         const boundCallback = callback.bind(p);
         boundCallback!({ value: this._value, parameter: p });
+        p.__listeners__.forEach(l => {
+          l.bind(this);
+          l({ value: this._value, parameter: p });
+        });
       } catch (ex) {
         console.log(ex);
       }
     });
+
     return this._value;
   }
 
@@ -70,6 +75,10 @@ export class Synapse {
     this._bound.forEach((callback, p) => {
       const boundCallback = callback.bind(p);
       boundCallback!({ metadataUpdated: { key, value }, parameter: p });
+      p.__listeners__.forEach(l => {
+        l.bind(this);
+        l!({ metadataUpdated: { key, value }, parameter: p });
+      });
     });
   }
 
@@ -82,6 +91,10 @@ export class Synapse {
       this._bound.forEach((callback, p) => {
         const boundCallback = callback.bind(p);
         boundCallback!({ metadataUpdated: { key: token, value: true }, parameter: p });
+        p.__listeners__.forEach(l => {
+          l.bind(this);
+          boundCallback!({ metadataUpdated: { key: token, value: true }, parameter: p });
+        });
       });
     }
   }
