@@ -288,7 +288,7 @@ export class SuperParameter extends Parameter<any> {
       const nonClassifiedMetadata = this.nonClassifiedMetadata(other);
       const classifiedKeys = Array.from(nonClassifiedMetadata.keys());
       const classifiedValues = Array.from(nonClassifiedMetadata.values());
-      this.setMetadataSeveral(SecretMetadataCopy, classifiedKeys, classifiedValues, false);
+      this.setMetadataSeveral(BindFromRequestToken, classifiedKeys, classifiedValues, false);
     } catch (err) {
       this.updateType(currBlueprint, true);
     }
@@ -313,7 +313,7 @@ export interface SuperParameterBlueprint {
 }
 
 export const SuperParameterTypeChangeRequestToken = 'typechangerequest';
-const SecretMetadataCopy = 'secretmetadatacopy';
+export const BindFromRequestToken = 'bindfromrequest';
 
 export enum SuperParameterType {
   NUMBER = 'NUMBER',
