@@ -17,8 +17,12 @@ const l2 = e => {
 
 p2.addListener(l2);
 
-p1.bindFrom(p2, e => {
-  console.log(`bound listener: ${e.value}`);
-});
+p1.bindFrom(p2, () => {});
 
-setInterval(() => p1.updateNext(1), 1000);
+// setInterval(() => p1.updateNext(1), 1000);
+// setTimeout(() => p1.unbind(), 5000);
+p1.unbind();
+p1.updateNext(1);
+p1.unbind();
+p1.updateNext(1);
+p1.bindFrom(p2, () => {});

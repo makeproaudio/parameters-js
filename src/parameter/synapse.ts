@@ -93,7 +93,7 @@ export class Synapse {
         boundCallback!({ metadataUpdated: { key: token, value: true }, parameter: p });
         p.__listeners__.forEach(l => {
           l.bind(this);
-          boundCallback!({ metadataUpdated: { key: token, value: true }, parameter: p });
+          l!({ metadataUpdated: { key: token, value: true }, parameter: p });
         });
       });
     }
@@ -104,6 +104,10 @@ export class Synapse {
     this._bound.forEach((callback, p) => {
       const boundCallback = callback.bind(p);
       boundCallback!({ metadataRemoved: { key }, parameter: p });
+      p.__listeners__.forEach(l => {
+        l.bind(this);
+        l!({ metadataRemoved: { key }, parameter: p });
+      });
     });
   }
 }

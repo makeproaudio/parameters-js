@@ -101,6 +101,7 @@ export abstract class Parameter<T> {
 
   unbind() {
     try {
+      if (!this._bound) return;
       const me: Synapse = Synapses.of(this);
       me.unset(this);
       Synapses.set(this, this._default);
