@@ -27,6 +27,10 @@ export class Synapse {
     return undefined;
   }
 
+  get(param: Parameter<any>): ((parameterChangeEvent: ParameterChangeEvent<any>) => void) | undefined {
+    return this._bound.get(param);
+  }
+
   set(param: Parameter<any>, cb: (parameterChangeEvent: ParameterChangeEvent<any>) => void) {
     let callback = this._bound.get(param);
     if (callback !== undefined) {

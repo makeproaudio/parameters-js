@@ -101,14 +101,16 @@ export abstract class Parameter<T> {
 
   unbind() {
     try {
-      if (!this._bound) return;
+      if (!this.bound()) return;
       const me: Synapse = Synapses.of(this);
       me.unset(this);
       Synapses.set(this, this._default);
       this.__release__();
-
       const lonely = me.lonely();
-      if (lonely) lonely.unbind();
+      if (lonely) {
+        lonely.unbind();
+      }
+      if (this._default.get(this) !== this._self) this._default.set(this, this._self);
     } catch (ex) {
       console.log(ex);
     }

@@ -16,11 +16,14 @@ const l2 = e => {
 };
 
 p2.addListener(l2);
+p2.unbind();
 
 p1.bindFrom(p2, () => {});
 
 // setInterval(() => p1.updateNext(1), 1000);
 // setTimeout(() => p1.unbind(), 5000);
+
+p2.unbind();
 p1.unbind();
 p1.updateNext(1);
 p1.unbind();
