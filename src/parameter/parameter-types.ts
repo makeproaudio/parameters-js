@@ -53,49 +53,42 @@ export class BooleanParameter extends Parameter<boolean> {
 
 /* The Super Parameter works on a few pre-defined conventions*/
 export class SuperParameter extends Parameter<any> {
-  /* All of the properties below are "possibly" undefined, because depending on the arguments
-   * supplied at the time of updating the parameter type, the SuperParameter may behave differently. */
-  private min: number | undefined;
-  private max: number | undefined;
-  private step: number | undefined;
-  private type: SuperParameterType;
-  private possibleValues: any[] | undefined;
   private classifiedMetadata = ['type', 'min', 'max', 'step', 'values'];
 
   getMin(): number | undefined {
-    return this.min;
+    return this.getMetadata('min');
   }
 
   getMax(): number | undefined {
-    return this.max;
+    return this.getMetadata('max');
   }
 
   getStep(): number | undefined {
-    return this.step;
+    return this.getMetadata('step');
   }
 
   getType(): SuperParameterType {
-    return this.type;
+    return this.getMetadata('type');
   }
 
   getPossibleValues(): any[] | undefined {
-    return this.possibleValues;
+    return this.getMetadata('values');
   }
 
   getBlueprint(): SuperParameterBlueprint {
-    switch (this.type) {
+    switch (this.getType()) {
       case SuperParameterType.BOOLEAN:
-        return { type: this.type, value: this.value() };
+        return { type: this.getType(), value: this.value() };
       case SuperParameterType.NUMBER:
-        return { type: this.type, max: this.max, min: this.min, step: this.step, value: this.value() };
+        return { type: this.getType(), max: this.getMax(), min: this.getMin(), step: this.getStep(), value: this.value() };
       case SuperParameterType.NUMBER_ARRAY:
-        return { type: this.type, values: this.possibleValues, value: this.value() };
+        return { type: this.getType(), values: this.getPossibleValues(), value: this.value() };
       case SuperParameterType.STRING:
-        return { type: this.type, value: this.value() };
+        return { type: this.getType(), value: this.value() };
       case SuperParameterType.STRING_ARRAY:
-        return { type: this.type, values: this.possibleValues, value: this.value() };
+        return { type: this.getType(), values: this.getPossibleValues(), value: this.value() };
       default:
-        return { type: this.type, value: this.value() };
+        return { type: this.getType(), value: this.value() };
     }
   }
 
@@ -104,7 +97,7 @@ export class SuperParameter extends Parameter<any> {
   the process of creation simplistic ƒ*/
   constructor(id: string) {
     super(false, id);
-    this.type = SuperParameterType.BOOLEAN;
+    this.setMetadata('type', SuperParameterType.BOOLEAN);
   }
 
   private areAllOfSameType(arr: any[], type: string) {
@@ -173,52 +166,44 @@ export class SuperParameter extends Parameter<any> {
   }
 
   private setMinMaxStep(min: number, max: number, step: number, value: number, secretly?: boolean): any {
-    this.min = min;
-    this.max = max;
-    this.step = step;
-    this.type = SuperParameterType.NUMBER;
-    this.possibleValues = undefined;
-    this.setMetadataSeveral(SuperParameterTypeChangeRequestToken, this.classifiedMetadata, [this.type, this.min, this.max, this.step, undefined], secretly);
+    this.setMetadata('type', SuperParameterType.NUMBER);
+    this.setMetadataSeveral(SuperParameterTypeChangeRequestToken, this.classifiedMetadata, [this.getType(), min, max, step, undefined], secretly);
     return this.update(value);
   }
 
   private setValues(values: any[], value: any, secretly?: boolean): any {
-    this.possibleValues = [];
-    values.forEach(v => this.possibleValues!.push(v));
-    if (typeof values[0] === 'number') this.type = SuperParameterType.NUMBER_ARRAY;
-    else if (typeof values[0] === 'string') this.type = SuperParameterType.STRING_ARRAY;
-    this.min = this.max = this.step = undefined;
-    this.setMetadataSeveral(
-      SuperParameterTypeChangeRequestToken,
-      this.classifiedMetadata,
-      [this.type, undefined, undefined, undefined, this.possibleValues],
-      secretly
-    );
+    if (typeof values[0] === 'number') this.setMetadata('type', SuperParameterType.NUMBER_ARRAY);
+    else if (typeof values[0] === 'string') this.setMetadata('type', SuperParameterType.STRING_ARRAY);
+    this.setMetadataSeveral(SuperParameterTypeChangeRequestToken, this.classifiedMetadata, [this.getType(), undefined, undefined, undefined, values], secretly);
     return this.update(value);
   }
 
   private setValueSpecific(value: string | boolean, secretly?: boolean): any {
-    if (typeof value === 'string') this.type = SuperParameterType.STRING;
-    else if (typeof value === 'boolean') this.type = SuperParameterType.BOOLEAN;
-    this.min = this.max = this.step = this.possibleValues = undefined;
-    this.setMetadataSeveral(SuperParameterTypeChangeRequestToken, this.classifiedMetadata, [this.type, undefined, undefined, undefined, undefined], secretly);
+    if (typeof value === 'string') this.setMetadata('type', SuperParameterType.STRING);
+    else if (typeof value === 'boolean') this.setMetadata('type', SuperParameterType.BOOLEAN);
+    this.setMetadataSeveral(
+      SuperParameterTypeChangeRequestToken,
+      this.classifiedMetadata,
+      [this.getType(), undefined, undefined, undefined, undefined],
+      secretly
+    );
     return this.update(value);
   }
 
   /* The SuperParameter ecosystem provides more convenient ways to update the value of a Parameter.
    * Depending on the current type of the Parameter, updateCyclic could do one of several things */
   updateCyclic(): any {
-    if (this.type === SuperParameterType.STRING) this.update(this.value(), true);
-    if ((this.type === SuperParameterType.NUMBER_ARRAY || this.type === SuperParameterType.STRING_ARRAY) && this.possibleValues) {
-      const currIndex = this.possibleValues.indexOf(this.value());
-      const indexToSet = (currIndex + 1) % this.possibleValues.length;
-      return this.update(this.possibleValues[indexToSet], true);
+    if (this.getType() === SuperParameterType.STRING) this.update(this.value(), true);
+    if ((this.getType() === SuperParameterType.NUMBER_ARRAY || this.getType() === SuperParameterType.STRING_ARRAY) && this.getPossibleValues()) {
+      const currIndex = this.getPossibleValues()!.indexOf(this.value());
+      const indexToSet = (currIndex + 1) % this.getPossibleValues()!.length;
+      return this.update(this.getPossibleValues()![indexToSet], true);
     }
-    if (this.type === SuperParameterType.BOOLEAN) this.update(!this.value());
-    if (this.type === SuperParameterType.NUMBER) {
-      const nextValue = (this.value() as number) + this.step!;
-      if (nextValue > this.max!) {
-        this.update(this.min!);
+    if (this.getType() === SuperParameterType.BOOLEAN) this.update(!this.value());
+    if (this.getType() === SuperParameterType.NUMBER) {
+      const nextValue = (this.value() as number) + this.getStep()!;
+      if (nextValue > this.getMax()!) {
+        this.update(this.getMin()!);
       } else {
         this.update(nextValue);
       }
@@ -226,42 +211,42 @@ export class SuperParameter extends Parameter<any> {
   }
 
   updateNext(jumps: number): any {
-    if (this.type === SuperParameterType.STRING) this.update(this.value(), true);
-    if ((this.type === SuperParameterType.NUMBER_ARRAY || this.type === SuperParameterType.STRING_ARRAY) && this.possibleValues) {
-      const currIndex = this.possibleValues.indexOf(this.value());
-      const indexToSet = Math.min(currIndex + 1, this.possibleValues.length - 1);
-      return this.update(this.possibleValues[indexToSet], true);
+    if (this.getType() === SuperParameterType.STRING) this.update(this.value(), true);
+    if ((this.getType() === SuperParameterType.NUMBER_ARRAY || this.getType() === SuperParameterType.STRING_ARRAY) && this.getPossibleValues()!) {
+      const currIndex = this.getPossibleValues()!.indexOf(this.value());
+      const indexToSet = Math.min(currIndex + 1, this.getPossibleValues()!.length - 1);
+      return this.update(this.getPossibleValues()![indexToSet], true);
     }
-    if (this.type === SuperParameterType.BOOLEAN) this.update(false);
-    if (this.type === SuperParameterType.NUMBER) this.update(Math.round((this.value() as number) + this.step! * jumps));
+    if (this.getType() === SuperParameterType.BOOLEAN) this.update(false);
+    if (this.getType() === SuperParameterType.NUMBER) this.update(Math.round((this.value() as number) + this.getStep()! * jumps));
   }
 
   updatePrevious(jumps: number): any {
-    if (this.type === SuperParameterType.STRING) this.update(this.value(), true);
-    if ((this.type === SuperParameterType.NUMBER_ARRAY || this.type === SuperParameterType.STRING_ARRAY) && this.possibleValues) {
-      const currIndex = this.possibleValues.indexOf(this.value());
+    if (this.getType() === SuperParameterType.STRING) this.update(this.value(), true);
+    if ((this.getType() === SuperParameterType.NUMBER_ARRAY || this.getType() === SuperParameterType.STRING_ARRAY) && this.getPossibleValues()!) {
+      const currIndex = this.getPossibleValues()!.indexOf(this.value());
       const indexToSet = Math.max(currIndex - 1, 0);
-      return this.update(this.possibleValues[indexToSet], true);
+      return this.update(this.getPossibleValues()![indexToSet], true);
     }
-    if (this.type === SuperParameterType.BOOLEAN) this.update(true);
-    if (this.type === SuperParameterType.NUMBER) this.update(Math.round((this.value() as number) - this.step! * jumps));
+    if (this.getType() === SuperParameterType.BOOLEAN) this.update(true);
+    if (this.getType() === SuperParameterType.NUMBER) this.update(Math.round((this.value() as number) - this.getStep()! * jumps));
   }
 
   /* This overrides the standard update method of the Parameter by adding a few checks before making the update */
   update(newVal: string | boolean | number, forceListenerUpdate?: boolean): any {
-    if (this.type === SuperParameterType.NUMBER) {
+    if (this.getType() === SuperParameterType.NUMBER) {
       let valToSend: number;
-      if (newVal < this.min!) valToSend = this.min!;
-      else if (newVal > this.max!) valToSend = this.max!;
+      if (newVal < this.getMin()!) valToSend = this.getMin()!;
+      else if (newVal > this.getMax()!) valToSend = this.getMax()!;
       else valToSend = newVal as number;
       return super.update(valToSend, forceListenerUpdate);
-    } else if (this.type === SuperParameterType.NUMBER_ARRAY && this.possibleValues) {
-      if (this.possibleValues.indexOf(newVal) < 0) {
+    } else if (this.getType() === SuperParameterType.NUMBER_ARRAY && this.getPossibleValues()!) {
+      if (this.getPossibleValues()!.indexOf(newVal) < 0) {
         //bad update - return existing value
         return super.value();
       }
-    } else if (this.type === SuperParameterType.STRING_ARRAY && this.possibleValues) {
-      if (this.possibleValues.indexOf(newVal) < 0) {
+    } else if (this.getType() === SuperParameterType.STRING_ARRAY && this.getPossibleValues()!) {
+      if (this.getPossibleValues()!.indexOf(newVal) < 0) {
         //bad update - return existing value
         return super.value();
       }
@@ -271,12 +256,12 @@ export class SuperParameter extends Parameter<any> {
 
   /* incoming range must be between 0 and 1 */
   updateRanged(newVal: number): any {
-    if (this.type !== SuperParameterType.NUMBER) return super.value();
-    const valToSend: number = this.min! + ((this.max! - this.min!) * (newVal - 0)) / (1 - 0);
+    if (this.getType() !== SuperParameterType.NUMBER) return super.value();
+    const valToSend: number = this.getMin()! + ((this.getMax()! - this.getMin()!) * (newVal - 0)) / (1 - 0);
     let rounded = 0;
-    if (valToSend > 0) rounded = Math.ceil(valToSend / this.step!) * this.step!;
-    else if (valToSend < 0) rounded = Math.floor(valToSend / this.step!) * this.step!;
-    else rounded = this.step!;
+    if (valToSend > 0) rounded = Math.ceil(valToSend / this.getStep()!) * this.getStep()!;
+    else if (valToSend < 0) rounded = Math.floor(valToSend / this.getStep()!) * this.getStep()!;
+    else rounded = this.getStep()!;
     super.update(rounded);
   }
 

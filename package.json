@@ -1,6 +1,6 @@
 {
   "name": "@makeproaudio/parameters-js",
-  "version": "1.0.7",
+  "version": "1.0.10",
   "description": "A generic real-time values synchronisation framework",
   "repository": {
     "type": "git",
