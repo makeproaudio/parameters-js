@@ -34,7 +34,7 @@ export class Synapse {
   set(param: Parameter<any>, cb: (parameterChangeEvent: ParameterChangeEvent<any>) => void) {
     let callback = this._bound.get(param);
     if (callback !== undefined) {
-      throw `${param.id()} already has callback attached in associated Synapse`;
+      throw `${param.id} already has callback attached in associated Synapse`;
     }
     this._bound.set(param, cb);
   }

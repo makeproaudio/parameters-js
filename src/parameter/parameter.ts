@@ -24,14 +24,14 @@ export abstract class Parameter<T> {
   }
 
   private _self_(callback: ParameterChangeEvent<T>) {
-    // console.log(`${callback.parameter.id()} self: new value is ${callback.parameter.value()}`);
+    // console.log(`${callback.parameter.id()} self: new value is ${callback.parameter.value}`);
   }
 
-  id(): string {
+  get id(): string {
     return this._id;
   }
 
-  value(): T {
+  get value(): T {
     return Synapses.of(this)._value;
   }
 
@@ -70,7 +70,7 @@ export abstract class Parameter<T> {
     return this.doUpdate(newValue, forceListenerUpdate);
   }
 
-  bound(): boolean {
+  get bound(): boolean {
     return this._bound;
   }
 
@@ -83,7 +83,7 @@ export abstract class Parameter<T> {
   }
 
   bindFrom(other: Parameter<T>, callback: (parameterChangeEvent: ParameterChangeEvent<T>) => void) {
-    if (!this.bound()) {
+    if (!this.bound) {
       try {
         const dest = Synapses.of(other);
         dest.set(this, callback);
@@ -94,14 +94,14 @@ export abstract class Parameter<T> {
         console.log(ex);
       }
     } else {
-      console.log(`${this.id()} is already bound to another Synapse`);
+      console.log(`${this.id} is already bound to another Synapse`);
     }
     /* set new value to incoming parameter immediately */
   }
 
   unbind() {
     try {
-      if (!this.bound()) return;
+      if (!this.bound) return;
       const me: Synapse = Synapses.of(this);
       me.unset(this);
       Synapses.set(this, this._default);

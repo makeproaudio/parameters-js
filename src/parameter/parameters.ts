@@ -87,7 +87,7 @@ class ParametersRegistry {
     error?: ((error: any) => void) | undefined,
     complete?: (() => void) | undefined
   ) => {
-    const filtered = this._stream.pipe(filter(p => p.id().split(this.delimiter)[1] === id));
+    const filtered = this._stream.pipe(filter(p => p.id.split(this.delimiter)[1] === id));
     filtered.subscribe(next, error, complete);
   };
 
@@ -101,7 +101,7 @@ class ParametersRegistry {
     const filtered = this._stream.pipe(
       filter(p =>
         p
-          .id()
+          .id
           .split(this.delimiter)[1]
           .startsWith(prefix)
       )
