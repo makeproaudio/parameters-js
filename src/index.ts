@@ -5,10 +5,11 @@ import {
   SuperParameterType as ParameterType,
   SuperParameterTypeChangeRequestToken as ParameterTypeChangeRequestToken,
   SuperParameterBlueprint as ParameterBlueprint,
+  BindFromRequestToken,
 } from './parameter/parameter-types';
 
 import { ParameterChangeEvent } from './parameter/parameter';
 
 export { Parameters };
-export { Parameter, ParameterType, ParameterTypeChangeRequestToken, ParameterBlueprint };
+export { Parameter, ParameterType, ParameterTypeChangeRequestToken, ParameterBlueprint, BindFromRequestToken };
 export { ParameterChangeEvent };
