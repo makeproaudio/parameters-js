@@ -9,7 +9,9 @@ import {
 } from './parameter/parameter-types';
 
 import { ParameterChangeEvent } from './parameter/parameter';
+import { getSynapsesManager, setSynapsesManager } from './parameter/synapses';
 
 export { Parameters };
 export { Parameter, ParameterType, ParameterTypeChangeRequestToken, ParameterBlueprint, BindFromRequestToken };
 export { ParameterChangeEvent };
+export { getSynapsesManager, setSynapsesManager };
