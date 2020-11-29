@@ -23,5 +23,13 @@ class SynapsesManager {
   }
 }
 
-export const Synapses = new SynapsesManager();
-Object.seal(Synapses);
+export let Synapses = new SynapsesManager();
+
+export function setSynapsesManager(s: SynapsesManager): void {
+  Synapses = s;
+}
+
+export function getSynapsesManager(): SynapsesManager {
+  return Synapses;
+}
+
