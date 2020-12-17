@@ -32,7 +32,7 @@
     "nodemon": "^1.19.4",
     "rollup": "^1.31.1",
     "rollup-plugin-typescript2": "^0.27.0",
-    "ts-node": "^8.5.4",
+    "ts-node": "^8.10.2",
     "tslint": "^5.20.1",
     "typescript": "^3.7.2"
   },
@@ -52,7 +52,12 @@
     "posttest": "npm run check",
     "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
     "lint": "tslint -p tsconfig.json",
-    "build": "rollup -c"
+    "build": "rollup -c",
+    "examples.bind-and-listener": "ts-node --project tsconfig.examples.json examples/bind-and-listener.ts",
+    "examples.bind-diff-synapse": "ts-node --project tsconfig.examples.json examples/bind-diff-synapse.ts",
+    "examples.bind-same-synapse": "ts-node --project tsconfig.examples.json examples/bind-same-synapse.ts",
+    "examples.listener": "ts-node --project tsconfig.examples.json examples/listener.ts",
+    "examples.metadata": "ts-node --project tsconfig.examples.json examples/metadata.ts"
   },
   "dependencies": {
     "rxjs": "^6.5.4",

@@ -1,4 +1,5 @@
-const { Parameters, ParameterType } = require('..');
+import { Parameters, ParameterType } from "../src";
+
 const p1 = Parameters.newParameter('user', 'p1');
 p1.updateType({ type: ParameterType.NUMBER, min: 100, max: 200, step: 1, value: 100 });
 
