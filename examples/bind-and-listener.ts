@@ -1,4 +1,5 @@
-const { Parameters, ParameterType } = require('..');
+import { Parameters, ParameterType } from "../src";
+
 const p1 = Parameters.newParameter('', 'p1');
 p1.updateType({ type: ParameterType.NUMBER, min: 100, max: 200, step: 1, value: 100 });
 
@@ -18,7 +19,7 @@ const l2 = e => {
 p2.addListener(l2);
 p2.unbind();
 
-p1.bindFrom(p2, () => {});
+p1.bindFrom(p2, () => { });
 
 // setInterval(() => p1.updateNext(1), 1000);
 // setTimeout(() => p1.unbind(), 5000);
@@ -28,4 +29,4 @@ p1.unbind();
 p1.updateNext(1);
 p1.unbind();
 p1.updateNext(1);
-p1.bindFrom(p2, () => {});
+p1.bindFrom(p2, () => { });
