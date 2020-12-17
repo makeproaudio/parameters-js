@@ -8,10 +8,10 @@ import {
   BindFromRequestToken,
 } from './parameter/parameter-types';
 
-import { ParameterChangeEvent } from './parameter/parameter';
+import { ParameterValueChangeEvent, ParameterMetadataChangeEvent } from './parameter/parameter';
 import { getSynapsesManager, setSynapsesManager } from './parameter/synapses';
 
 export { Parameters };
 export { Parameter, ParameterType, ParameterTypeChangeRequestToken, ParameterBlueprint, BindFromRequestToken };
-export { ParameterChangeEvent };
+export { ParameterValueChangeEvent, ParameterMetadataChangeEvent };
 export { getSynapsesManager, setSynapsesManager };

@@ -5,17 +5,21 @@ import { Synapse } from './synapse';
  */
 export abstract class Parameter<T> {
   private _id: string;
-  private _self: (callback: ParameterChangeEvent<T>) => void;
+  private _selfValue: (callback: ParameterValueChangeEvent<T>) => void;
+  private _selfMetadata: (callback: ParameterMetadataChangeEvent<T>) => void;
   private _default: Synapse;
-  __listeners__: ((callback: ParameterChangeEvent<T>) => void)[];
+  __valueListeners__: ((callback: ParameterValueChangeEvent<T>) => void)[];
+  __metadataListeners__: ((callback: ParameterMetadataChangeEvent<T>) => void)[];
   private _bound: boolean;
 
   constructor(initValue: T, id: string) {
     this._id = id;
-    this._self = this._self_;
-    this.__listeners__ = [];
+    this._selfValue = this._selfValue_;
+    this._selfMetadata = this._selfMetadata_;
+    this.__valueListeners__ = [];
+    this.__metadataListeners__ = [];
     this._default = Synapses.create(this, initValue);
-    this._default.set(this, this._self);
+    this._default.set(this, this._selfValue, this._selfMetadata);
     this._bound = false;
   }
 
@@ -23,7 +27,11 @@ export abstract class Parameter<T> {
     return this._default;
   }
 
-  private _self_(callback: ParameterChangeEvent<T>) {
+  private _selfValue_(callback: ParameterValueChangeEvent<T>) {
+    // console.log(`${callback.parameter.id()} self: new value is ${callback.parameter.value}`);
+  }
+
+  private _selfMetadata_(callback: ParameterMetadataChangeEvent<T>) {
     // console.log(`${callback.parameter.id()} self: new value is ${callback.parameter.value}`);
   }
 
@@ -82,11 +90,11 @@ export abstract class Parameter<T> {
     this._bound = false;
   }
 
-  bindFrom(other: Parameter<T>, callback: (parameterChangeEvent: ParameterChangeEvent<T>) => void) {
+  bindFrom(other: Parameter<T>, valueCallback?: (parameterChangeEvent: ParameterValueChangeEvent<T>) => void, metadataCallback?: (parameterChangeEvent: ParameterMetadataChangeEvent<T>) => void) {
     if (!this.bound) {
       try {
         const dest = Synapses.of(other);
-        dest.set(this, callback);
+        dest.set(this, valueCallback, metadataCallback);
         Synapses.set(this, dest);
         this.__acquire__();
         other.__acquire__();
@@ -110,26 +118,40 @@ export abstract class Parameter<T> {
       if (lonely) {
         lonely.unbind();
       }
-      if (this._default.get(this) !== this._self) this._default.set(this, this._self);
+      if (this._default.get(this)?.value !== this._selfValue || this._default.get(this)?.metadata !== this._selfMetadata) {
+        this._default.set(this, this._selfValue, this._selfMetadata)
+      }
     } catch (ex) {
       console.log(ex);
     }
   }
 
-  addListener(callback: (parameterChangeEvent: ParameterChangeEvent<T>) => void) {
+  addValueListener(callback: (parameterChangeEvent: ParameterValueChangeEvent<T>) => void) {
     // const dest = Synapses.of(this);
     // dest.add(this, callback);
-    this.__listeners__.push(callback);
+    this.__valueListeners__.push(callback);
+  }
+  addMetadataListener(callback: (parameterChangeEvent: ParameterMetadataChangeEvent<T>) => void) {
+    // const dest = Synapses.of(this);
+    // dest.add(this, callback);
+    this.__metadataListeners__.push(callback);
   }
 
-  removeListener(callback: (parameterChangeEvent: ParameterChangeEvent<T>) => void) {
-    this.__listeners__.splice(this.__listeners__.indexOf(callback), 1);
+  removeValueListener(callback: (parameterChangeEvent: ParameterValueChangeEvent<T>) => void) {
+    this.__valueListeners__.splice(this.__valueListeners__.indexOf(callback), 1);
+  }
+  removeMetadataListener(callback: (parameterChangeEvent: ParameterMetadataChangeEvent<T>) => void) {
+    this.__metadataListeners__.splice(this.__metadataListeners__.indexOf(callback), 1);
   }
 }
 
-export interface ParameterChangeEvent<T> {
+export interface ParameterValueChangeEvent<T> {
   parameter: Parameter<T>;
-  value?: T;
+  value: T;
+}
+
+export interface ParameterMetadataChangeEvent<T> {
+  parameter: Parameter<T>;
   metadataUpdated?: {
     key: string;
     value: any;

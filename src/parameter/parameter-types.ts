@@ -1,4 +1,4 @@
-import { Parameter, ParameterChangeEvent } from './parameter';
+import { Parameter, ParameterValueChangeEvent, ParameterMetadataChangeEvent } from './parameter';
 
 export class NumberParameter extends Parameter<number> {
   private min: number;
@@ -265,11 +265,11 @@ export class SuperParameter extends Parameter<any> {
     super.update(rounded);
   }
 
-  bindFrom(other: SuperParameter, callback: (parameterChangeEvent: ParameterChangeEvent<any>) => void) {
+  bindFrom(other: SuperParameter, valueCallback?: (parameterChangeEvent: ParameterValueChangeEvent<any>) => void, metadataCallback?: (parameterChangeEvent: ParameterMetadataChangeEvent<any>) => void) {
     const currBlueprint = this.getBlueprint();
     this.updateType(other.getBlueprint(), true);
     try {
-      super.bindFrom(other, callback);
+      super.bindFrom(other, valueCallback, metadataCallback);
       const nonClassifiedMetadata = this.nonClassifiedMetadata(other);
       const classifiedKeys = Array.from(nonClassifiedMetadata.keys());
       const classifiedValues = Array.from(nonClassifiedMetadata.values());
