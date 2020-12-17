@@ -265,7 +265,7 @@ export class SuperParameter extends Parameter<any> {
     super.update(rounded);
   }
 
-  bindFrom(other: SuperParameter, valueCallback: (parameterChangeEvent: ParameterValueChangeEvent<any>) => void, metadataCallback: (parameterChangeEvent: ParameterMetadataChangeEvent<any>) => void) {
+  bindFrom(other: SuperParameter, valueCallback?: (parameterChangeEvent: ParameterValueChangeEvent<any>) => void, metadataCallback?: (parameterChangeEvent: ParameterMetadataChangeEvent<any>) => void) {
     const currBlueprint = this.getBlueprint();
     this.updateType(other.getBlueprint(), true);
     try {

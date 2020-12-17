@@ -1,7 +1,7 @@
 import { Parameter, ParameterValueChangeEvent, ParameterMetadataChangeEvent } from './parameter';
 import { v4 as uuid } from 'uuid';
 
-type Callbacks = { value: (parameterChangeEvent: ParameterValueChangeEvent<any>) => void, metadata: (parameterChangeEvent: ParameterMetadataChangeEvent<any>) => void };
+type Callbacks = { value?: (parameterChangeEvent: ParameterValueChangeEvent<any>) => void, metadata?: (parameterChangeEvent: ParameterMetadataChangeEvent<any>) => void };
 /* The Synapse should have the true value. Parameters bound to the same synapse should 'request' 
 the synapse to make an update*/
 export class Synapse {
@@ -32,7 +32,7 @@ export class Synapse {
     return this._bound.get(param);
   }
 
-  set(param: Parameter<any>, valueCb: (parameterChangeEvent: ParameterValueChangeEvent<any>) => void, metadataCb: (parameterChangeEvent: ParameterMetadataChangeEvent<any>) => void) {
+  set(param: Parameter<any>, valueCb?: (parameterChangeEvent: ParameterValueChangeEvent<any>) => void, metadataCb?: (parameterChangeEvent: ParameterMetadataChangeEvent<any>) => void) {
     let callback = this._bound.get(param);
     if (callback !== undefined) {
       throw `${param.id} already has callback attached in associated Synapse`;
@@ -53,8 +53,8 @@ export class Synapse {
     this._value = value;
     this._bound.forEach((callback, p) => {
       try {
-        const boundCallback = callback.value.bind(p);
-        boundCallback!({ value: this._value, parameter: p });
+        const boundCallback = callback.value?.bind(p);
+        if (boundCallback) boundCallback({ value: this._value, parameter: p });
         p.__valueListeners__.forEach(l => {
           l.bind(this);
           l({ value: this._value, parameter: p });
@@ -78,8 +78,8 @@ export class Synapse {
   setMetadata(key: string, value: any) {
     this._metadata.set(key, value);
     this._bound.forEach((callback, p) => {
-      const boundCallback = callback.metadata.bind(p);
-      boundCallback!({ metadataUpdated: { key, value }, parameter: p });
+      const boundCallback = callback.metadata?.bind(p);
+      if (boundCallback) boundCallback!({ metadataUpdated: { key, value }, parameter: p });
       p.__metadataListeners__.forEach(l => {
         l.bind(this);
         l!({ metadataUpdated: { key, value }, parameter: p });
@@ -94,8 +94,8 @@ export class Synapse {
     }
     if (!secretly) {
       this._bound.forEach((callback, p) => {
-        const boundCallback = callback.metadata.bind(p);
-        boundCallback!({ metadataUpdated: { key: token, value: true }, parameter: p });
+        const boundCallback = callback.metadata?.bind(p);
+        if (boundCallback) boundCallback!({ metadataUpdated: { key: token, value: true }, parameter: p });
         p.__metadataListeners__.forEach(l => {
           l.bind(this);
           l!({ metadataUpdated: { key: token, value: true }, parameter: p });
@@ -107,8 +107,8 @@ export class Synapse {
   removeMetadata(key: string) {
     this._metadata.delete(key);
     this._bound.forEach((callback, p) => {
-      const boundCallback = callback.metadata.bind(p);
-      boundCallback!({ metadataRemoved: { key }, parameter: p });
+      const boundCallback = callback.metadata?.bind(p);
+      if (boundCallback) boundCallback!({ metadataRemoved: { key }, parameter: p });
       p.__metadataListeners__.forEach(l => {
         l.bind(this);
         l!({ metadataRemoved: { key }, parameter: p });

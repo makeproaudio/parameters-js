@@ -90,7 +90,7 @@ export abstract class Parameter<T> {
     this._bound = false;
   }
 
-  bindFrom(other: Parameter<T>, valueCallback: (parameterChangeEvent: ParameterValueChangeEvent<T>) => void, metadataCallback: (parameterChangeEvent: ParameterMetadataChangeEvent<T>) => void) {
+  bindFrom(other: Parameter<T>, valueCallback?: (parameterChangeEvent: ParameterValueChangeEvent<T>) => void, metadataCallback?: (parameterChangeEvent: ParameterMetadataChangeEvent<T>) => void) {
     if (!this.bound) {
       try {
         const dest = Synapses.of(other);
