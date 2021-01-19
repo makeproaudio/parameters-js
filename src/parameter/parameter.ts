@@ -43,10 +43,27 @@ export abstract class Parameter<T> {
     return Synapses.of(this)._value;
   }
 
+  set value(value: T) {
+    this.doUpdate(value);
+  }
+
   private doUpdate(newValue: T, forceListenerUpdate?: boolean): T {
     const dest = Synapses.of(this);
     const updatedValue = dest.update(newValue, forceListenerUpdate);
     return updatedValue;
+  }
+
+  get label(): string {
+    return Synapses.of(this).getMetadata("label");
+  }
+  set label(label: string) {
+    Synapses.of(this).setMetadata("label", label);
+  }
+  get color(): string {
+    return Synapses.of(this).getMetadata("color");
+  }
+  set color(color: string) {
+    Synapses.of(this).setMetadata("color", color);
   }
 
   setMetadata(key: string, value: any) {
