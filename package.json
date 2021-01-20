@@ -57,6 +57,7 @@
     "examples.bind-diff-synapse": "ts-node --project tsconfig.examples.json examples/bind-diff-synapse.ts",
     "examples.bind-same-synapse": "ts-node --project tsconfig.examples.json examples/bind-same-synapse.ts",
     "examples.listener": "ts-node --project tsconfig.examples.json examples/listener.ts",
+    "examples.persistent-listener": "ts-node --project tsconfig.examples.json examples/persistent-listener.ts",
     "examples.metadata": "ts-node --project tsconfig.examples.json examples/metadata.ts"
   },
   "dependencies": {

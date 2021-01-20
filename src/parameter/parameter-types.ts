@@ -95,9 +95,15 @@ export class SuperParameter extends Parameter<any> {
   /* By default, a freshly constructed SuperParameter will be of type boolean. This is done to 
   * channel the type updation of a SuperParameter through the TypeChangeRequest only and to keep
   the process of creation simplistic ƒ*/
-  constructor(id: string) {
+  constructor(id: string, valueChangeCallback?: (e: ParameterValueChangeEvent<any>) => void, metadataChangeCallback?: (e: ParameterMetadataChangeEvent<any>) => void) {
     super(false, id);
     this.setMetadata('type', SuperParameterType.BOOLEAN);
+    if (typeof valueChangeCallback == "function") {
+      this.addValueListener(valueChangeCallback);
+    }
+    if (typeof metadataChangeCallback == "function") {
+      this.addMetadataListener(metadataChangeCallback);
+    }
   }
 
   private areAllOfSameType(arr: any[], type: string) {
