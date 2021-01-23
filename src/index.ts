@@ -17,6 +17,6 @@ import { SuperParameterTypeChangeRequestToken, BindFromRequestToken } from './mo
 
 export { Parameters };
 export { Parameter, SuperParameter, BooleanParameter, NumberParameter, StringParameter, StringArrayParameter, IntegerArrayParameter, ArrayParameter };
-export { ParameterType as SuperParameterType, SuperParameterTypeChangeRequestToken, ParameterBlueprint, BindFromRequestToken };
+export { ParameterType, SuperParameterTypeChangeRequestToken, ParameterBlueprint, BindFromRequestToken };
 export { ParameterValueChangeEvent, ParameterMetadataChangeEvent };
 export { getSynapsesManager, setSynapsesManager };
