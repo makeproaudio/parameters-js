@@ -1,4 +1,4 @@
-import { ReplaySubject } from 'rxjs';
+import { Subject } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { BooleanParameter } from './parameter-types/BooleanParameter';
 import { IntegerArrayParameter } from './parameter-types/IntegerArrayParameter';
@@ -12,11 +12,11 @@ class ParametersRegistry {
   // tslint:disable-next-line: no-any
   private params: Map<string, Parameter<any>> = new Map();
   private delimiter = '.';
-  private _stream: ReplaySubject<Parameter<any>>;
+  private _stream: Subject<Parameter<any>>;
 
   constructor() {
     // tslint:disable-next-line: no-any
-    this._stream = new ReplaySubject<Parameter<any>>();
+    this._stream = new Subject<Parameter<any>>();
   }
 
   private qualifiedName = (namespace: string, id: string): string => {
