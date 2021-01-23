@@ -6,7 +6,6 @@ import { ParameterBlueprint } from "../models/ParameterBlueprint";
 
 /* The Super Parameter works on a few pre-defined conventions*/
 export class SuperParameter extends Parameter<any> {
-    private classifiedMetadata = ['type', 'min', 'max', 'step', 'values'];
 
     get min(): number | undefined {
         return this.getMetadata('min');
@@ -116,26 +115,21 @@ export class SuperParameter extends Parameter<any> {
 
     private setMinMaxStep(min: number, max: number, step: number, value: number, secretly?: boolean): any {
         this.setMetadata('type', ParameterType.NUMBER);
-        this.setMetadataSeveral(SuperParameterTypeChangeRequestToken, this.classifiedMetadata, [this.type, min, max, step, undefined], secretly);
+        this.setMetadataSeveral(SuperParameterTypeChangeRequestToken, { type: this.type, min, max, step }, secretly);
         return this.update(value);
     }
 
     private setValues(values: any[], value: any, secretly?: boolean): any {
         if (typeof values[0] === 'number') this.setMetadata('type', ParameterType.NUMBER_ARRAY);
         else if (typeof values[0] === 'string') this.setMetadata('type', ParameterType.STRING_ARRAY);
-        this.setMetadataSeveral(SuperParameterTypeChangeRequestToken, this.classifiedMetadata, [this.type, undefined, undefined, undefined, values], secretly);
+        this.setMetadataSeveral(SuperParameterTypeChangeRequestToken, { type: this.type, min: undefined, max: undefined, step: undefined, values }, secretly);
         return this.update(value);
     }
 
     private setValueSpecific(value: string | boolean, secretly?: boolean): any {
         if (typeof value === 'string') this.setMetadata('type', ParameterType.STRING);
         else if (typeof value === 'boolean') this.setMetadata('type', ParameterType.BOOLEAN);
-        this.setMetadataSeveral(
-            SuperParameterTypeChangeRequestToken,
-            this.classifiedMetadata,
-            [this.type, undefined, undefined, undefined, undefined],
-            secretly
-        );
+        this.setMetadataSeveral(SuperParameterTypeChangeRequestToken, { type: this.type, min: undefined, max: undefined, step: undefined, values: undefined }, secretly);
         return this.update(value);
     }
 
@@ -219,20 +213,9 @@ export class SuperParameter extends Parameter<any> {
         this.updateType(other.blueprint, true);
         try {
             super.bindFrom(other, valueCallback, metadataCallback);
-            const nonClassifiedMetadata = this.nonClassifiedMetadata(other);
-            const classifiedKeys = Array.from(nonClassifiedMetadata.keys());
-            const classifiedValues = Array.from(nonClassifiedMetadata.values());
-            this.setMetadataSeveral(BindFromRequestToken, classifiedKeys, classifiedValues, false);
+            this.setMetadataSeveral(BindFromRequestToken, (Object as any).fromEntries(other.getAllMetadata()), false);
         } catch (err) {
             this.updateType(currBlueprint, true);
         }
-    }
-
-    nonClassifiedMetadata(param: Parameter<any>): Map<string, any> {
-        const ret = new Map<string, any>();
-        param.getAllMetadata().forEach((v, k) => {
-            if (!this.classifiedMetadata.includes(k)) ret.set(k, v);
-        });
-        return ret;
     }
 }

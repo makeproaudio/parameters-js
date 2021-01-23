@@ -89,9 +89,9 @@ export abstract class Parameter<T> {
     dest.setMetadata(key, value);
   }
 
-  setMetadataSeveral(token: string, key: string[], value: any[], secretly?: boolean) {
+  setMetadataSeveral(token: string, metadata: Record<string, any>, secretly?: boolean) {
     const dest = Synapses.of(this);
-    dest.setMetadataSeveral(token, key, value, secretly);
+    dest.setMetadataSeveral(token, metadata, secretly);
   }
 
   removeMetadata(key: string) {

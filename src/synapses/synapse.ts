@@ -88,10 +88,9 @@ export class Synapse {
     });
   }
 
-  setMetadataSeveral(token: string, keys: string[], values: any[], secretly?: boolean) {
-    if (keys.length != values.length) throw Error('while updating several metadata, length of keys and values array should be the same');
-    for (let i = 0; i < keys.length; i++) {
-      this._metadata.set(keys[i], values[i]);
+  setMetadataSeveral(token: string, metadata: Record<string, any>, secretly?: boolean) {
+    for (const [key, value] of Object.entries(metadata)) {
+      this._metadata.set(key, value);
     }
     if (!secretly) {
       this._bound.forEach((callback, p) => {

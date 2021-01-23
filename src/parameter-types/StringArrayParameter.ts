@@ -10,6 +10,6 @@ export class StringArrayParameter extends ArrayParameter<string> {
     }
 
     get blueprint(): ParameterBlueprint {
-        return { type: this.type, values: this.possibleValues, value: this.value };
+        return { type: this.type, values: this.getMetadata("possibleValues"), value: this.value };
     }
 }
