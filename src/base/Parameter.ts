@@ -1,5 +1,8 @@
-import { Synapses } from './synapses';
-import { Synapse } from './synapse';
+import { Synapses } from '../synapses/synapses';
+import { Synapse } from '../synapses/synapse';
+import { ParameterValueChangeEvent, ParameterMetadataChangeEvent } from '../Events';
+import { ParameterBlueprint } from '../models/ParameterBlueprint';
+import { ParameterType } from '../models/ParameterType';
 
 /* As seen over here, the Parameter does not hold the Metadata or the Value. The Synapse is responsible for that
  */
@@ -30,8 +33,16 @@ export abstract class Parameter<T> {
     }
   }
 
+  get type(): ParameterType {
+    return this.getMetadata('type');
+  }
+
   __default__(): Synapse {
     return this._default;
+  }
+
+  get blueprint(): ParameterBlueprint {
+    return {} as ParameterBlueprint;
   }
 
   private _selfValue_(callback: ParameterValueChangeEvent<T>) {
@@ -167,20 +178,4 @@ export abstract class Parameter<T> {
   removeMetadataListener(callback: (parameterChangeEvent: ParameterMetadataChangeEvent<T>) => void) {
     this.__metadataListeners__.splice(this.__metadataListeners__.indexOf(callback), 1);
   }
-}
-
-export interface ParameterValueChangeEvent<T> {
-  parameter: Parameter<T>;
-  value: T;
-}
-
-export interface ParameterMetadataChangeEvent<T> {
-  parameter: Parameter<T>;
-  metadataUpdated?: {
-    key: string;
-    value: any;
-  };
-  metadataRemoved?: {
-    key: string;
-  };
 }

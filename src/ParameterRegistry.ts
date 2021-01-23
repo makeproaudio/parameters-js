@@ -1,7 +1,12 @@
-import { Parameter } from './parameter';
-import { NumberParameter, StringParameter, IntegerArrayParameter, StringArrayParameter, BooleanParameter, SuperParameter } from './parameter-types';
 import { ReplaySubject } from 'rxjs';
 import { filter } from 'rxjs/operators';
+import { BooleanParameter } from './parameter-types/BooleanParameter';
+import { IntegerArrayParameter } from './parameter-types/IntegerArrayParameter';
+import { NumberParameter } from './parameter-types/NumberParameter';
+import { Parameter } from './base/Parameter';
+import { StringArrayParameter } from './parameter-types/StringArrayParameter';
+import { StringParameter } from './parameter-types/StringParameter';
+import { SuperParameter } from './parameter-types/SuperParameter';
 
 class ParametersRegistry {
   // tslint:disable-next-line: no-any
@@ -18,9 +23,9 @@ class ParametersRegistry {
     return namespace.concat(this.delimiter).concat(id);
   };
 
-  numberParameter = (init: number, min: number, max: number, namespace: string, id: string): NumberParameter => {
+  numberParameter = (init: number, min: number, max: number, step: number, namespace: string, id: string): NumberParameter => {
     const qualifiedName = this.qualifiedName(namespace, id);
-    const param = new NumberParameter(init, min, max, this.qualifiedName(namespace, id));
+    const param = new NumberParameter(init, min, max, step, this.qualifiedName(namespace, id));
     this.params.set(qualifiedName, param);
     this._stream.next(param);
     return param;
@@ -112,16 +117,19 @@ class ParametersRegistry {
 
 /* Once the SuperParameter came into existence, the classical Parameter types have been deemed to be for internal
  * use only. Hence the only export from the Parameter Registry is the creation process of a SuperParameter.*/
-const Parameters: ParametersRegistry = new ParametersRegistry();
+const ParameterRegistry: ParametersRegistry = new ParametersRegistry();
 // export const newBooleanParameter = Parameters.booleanParameter;
 // export const newStringParameter = Parameters.stringParameter;
 // export const newStringArrayParameter = Parameters.stringArrayParameter;
 // export const newNumberParameter = Parameters.integerParameter;
 // export const newNumberArrayParameter = Parameters.integerArrayParameter;
-export const newParameter = Parameters.superParameter;
-export const getExact = Parameters.getExact;
-export const subscribe = Parameters.subscribe;
-export const subscribeLoose = Parameters.subscribeLoose;
-export const getDisregardingNamespace = Parameters.getDisregardingNamespace;
 
-Object.freeze(Parameters);
+export const Parameters = {
+  newParameter: ParameterRegistry.superParameter,
+  getExact: ParameterRegistry.getExact,
+  subscribe: ParameterRegistry.subscribe,
+  subscribeLoose: ParameterRegistry.subscribeLoose,
+  getDisregardingNamespace: ParameterRegistry.getDisregardingNamespace,
+};
+
+Object.freeze(ParameterRegistry);

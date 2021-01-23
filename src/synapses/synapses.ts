@@ -1,4 +1,4 @@
-import { Parameter } from './parameter';
+import { Parameter } from '../base/Parameter';
 import { Synapse } from './synapse';
 
 /* A simple registry mechanism used only internally to manage Synapses. */

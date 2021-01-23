@@ -1,5 +1,6 @@
-import { Parameter, ParameterValueChangeEvent, ParameterMetadataChangeEvent } from './parameter';
+import { Parameter } from '../base/Parameter';
 import { v4 as uuid } from 'uuid';
+import { ParameterValueChangeEvent, ParameterMetadataChangeEvent } from '../Events';
 
 type Callbacks = { value?: (parameterChangeEvent: ParameterValueChangeEvent<any>) => void, metadata?: (parameterChangeEvent: ParameterMetadataChangeEvent<any>) => void };
 /* The Synapse should have the true value. Parameters bound to the same synapse should 'request' 
