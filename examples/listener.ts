@@ -1,7 +1,7 @@
-import { Parameters, ParameterType, ParameterValueChangeEvent } from "../src";
+import { Parameters, SuperParameterType, ParameterValueChangeEvent } from "../src";
 
 const p1 = Parameters.newParameter('', 'p1');
-p1.updateType({ type: ParameterType.NUMBER, min: 100, max: 200, step: 1, value: 100 });
+p1.updateType({ type: SuperParameterType.NUMBER, min: 100, max: 200, step: 1, value: 100 });
 
 const l1 = (e: ParameterValueChangeEvent<any>) => {
   console.log(`l1 listener: ${e.value}`);
