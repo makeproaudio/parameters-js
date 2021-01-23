@@ -1,7 +1,7 @@
-import { Parameter } from "../src";
+import { SuperParameter } from "../src";
 
-const p1 = new Parameter("p1");
-const p2 = new Parameter("p2", (e) => console.log("persistent p2 listener:", e.value));
+const p1 = new SuperParameter("p1");
+const p2 = new SuperParameter("p2", (e) => console.log("persistent p2 listener:", e.value));
 
 p1.bindFrom(p2, (e) => console.log("p1 listener:", e.value));
 

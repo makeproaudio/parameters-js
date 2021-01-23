@@ -4,8 +4,8 @@ export class NumberParameter extends Parameter<number> {
   private min: number;
   private max: number;
 
-  constructor(initValue: number, min: number, max: number, id: string) {
-    super(initValue, id);
+  constructor(initValue: number, min: number, max: number, id: string, valueChangeCallback?: (e: ParameterValueChangeEvent<any>) => void, metadataChangeCallback?: (e: ParameterMetadataChangeEvent<any>) => void) {
+    super(initValue, id, valueChangeCallback, metadataChangeCallback);
     this.min = min;
     this.max = max;
   }
@@ -21,33 +21,33 @@ export class NumberParameter extends Parameter<number> {
 
 export abstract class ArrayParameter<T> extends Parameter<T> {
   private possibleValues: T[];
-  constructor(initValue: T, possibleValues: T[], id: string) {
-    super(initValue, id);
+  constructor(initValue: T, possibleValues: T[], id: string, valueChangeCallback?: (e: ParameterValueChangeEvent<any>) => void, metadataChangeCallback?: (e: ParameterMetadataChangeEvent<any>) => void) {
+    super(initValue, id, valueChangeCallback, metadataChangeCallback);
     this.possibleValues = possibleValues;
   }
 }
 
 export class IntegerArrayParameter extends ArrayParameter<number> {
-  constructor(initValue: number, possibleValues: number[], id: string) {
-    super(initValue, possibleValues, id);
+  constructor(initValue: number, possibleValues: number[], id: string, valueChangeCallback?: (e: ParameterValueChangeEvent<any>) => void, metadataChangeCallback?: (e: ParameterMetadataChangeEvent<any>) => void) {
+    super(initValue, possibleValues, id, valueChangeCallback, metadataChangeCallback);
   }
 }
 
 export class StringParameter extends Parameter<string> {
-  constructor(initValue: string, id: string) {
-    super(initValue, id);
+  constructor(initValue: string, id: string, valueChangeCallback?: (e: ParameterValueChangeEvent<any>) => void, metadataChangeCallback?: (e: ParameterMetadataChangeEvent<any>) => void) {
+    super(initValue, id, valueChangeCallback, metadataChangeCallback);
   }
 }
 
 export class StringArrayParameter extends ArrayParameter<string> {
-  constructor(initValue: string, possibleValues: string[], id: string) {
-    super(initValue, possibleValues, id);
+  constructor(initValue: string, possibleValues: string[], id: string, valueChangeCallback?: (e: ParameterValueChangeEvent<any>) => void, metadataChangeCallback?: (e: ParameterMetadataChangeEvent<any>) => void) {
+    super(initValue, possibleValues, id, valueChangeCallback, metadataChangeCallback);
   }
 }
 
 export class BooleanParameter extends Parameter<boolean> {
-  constructor(initValue: boolean, id: string) {
-    super(initValue, id);
+  constructor(initValue: boolean, id: string, valueChangeCallback?: (e: ParameterValueChangeEvent<any>) => void, metadataChangeCallback?: (e: ParameterMetadataChangeEvent<any>) => void) {
+    super(initValue, id, valueChangeCallback, metadataChangeCallback);
   }
 }
 
@@ -96,14 +96,8 @@ export class SuperParameter extends Parameter<any> {
   * channel the type updation of a SuperParameter through the TypeChangeRequest only and to keep
   the process of creation simplistic ƒ*/
   constructor(id: string, valueChangeCallback?: (e: ParameterValueChangeEvent<any>) => void, metadataChangeCallback?: (e: ParameterMetadataChangeEvent<any>) => void) {
-    super(false, id);
+    super(false, id, valueChangeCallback, metadataChangeCallback);
     this.setMetadata('type', SuperParameterType.BOOLEAN);
-    if (typeof valueChangeCallback == "function") {
-      this.addValueListener(valueChangeCallback);
-    }
-    if (typeof metadataChangeCallback == "function") {
-      this.addMetadataListener(metadataChangeCallback);
-    }
   }
 
   private areAllOfSameType(arr: any[], type: string) {

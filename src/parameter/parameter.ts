@@ -12,7 +12,7 @@ export abstract class Parameter<T> {
   __metadataListeners__: ((callback: ParameterMetadataChangeEvent<T>) => void)[];
   private _bound: boolean;
 
-  constructor(initValue: T, id: string) {
+  constructor(initValue: T, id: string, valueChangeCallback?: (e: ParameterValueChangeEvent<any>) => void, metadataChangeCallback?: (e: ParameterMetadataChangeEvent<any>) => void) {
     this._id = id;
     this._selfValue = this._selfValue_;
     this._selfMetadata = this._selfMetadata_;
@@ -21,6 +21,13 @@ export abstract class Parameter<T> {
     this._default = Synapses.create(this, initValue);
     this._default.set(this, this._selfValue, this._selfMetadata);
     this._bound = false;
+
+    if (typeof valueChangeCallback == "function") {
+      this.addValueListener(valueChangeCallback);
+    }
+    if (typeof metadataChangeCallback == "function") {
+      this.addMetadataListener(metadataChangeCallback);
+    }
   }
 
   __default__(): Synapse {
