@@ -1,15 +1,13 @@
 import { BooleanParameter, NumberParameter, SuperParameter } from "../src";
 
-const stack1 = new SuperParameter("stack1", (e) => console.log("stack1:", e.value));
-const stack2 = new SuperParameter("stack2", (e) => console.log("stack2:", e.value));
-const target1 = new NumberParameter(0, 0, 100, 1, "target1", (e) => console.log("target1:", e.value));
-const target2 = new BooleanParameter(false, "target2", (e) => console.log("target2:", e.value));
-const automation = new BooleanParameter(false, "automation", (e) => console.log("automation:", e.value));
+const uiScreenStack = new SuperParameter("uiScreenStack", (e) => console.log("uiScreen stack:", e.value));
+const feature = new NumberParameter(0, 0, 100, 1, "feature", (e) => console.log("feature:", e.value));
+const hw1Stack = new SuperParameter("hw1Stack", (e) => console.log("hw1Stack:", e.value));
+const hw2Stack = new SuperParameter("hw2Stack", (e) => console.log("hw2Stack:", e.value));
 
-stack1.bindFrom(target1);
-stack2.bindFrom(target1);
-automation.bindFrom(stack1);
-// stack2.bindFrom(stack2);
+uiScreenStack.bindFrom(feature);
+hw1Stack.bindFrom(feature);
+hw2Stack.bindFrom(feature);
 
-setInterval(() => target1.update(target1.value + 1), 1000);
+setInterval(() => hw2Stack.update(hw1Stack.value + 1), 1000);
 // setInterval(() => target2.updateCyclic(), 1000);
