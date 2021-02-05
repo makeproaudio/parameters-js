@@ -77,22 +77,28 @@ export class Synapse {
   }
 
   setMetadata(key: string, value: any) {
-    this._metadata.set(key, value);
-    this._bound.forEach((callback, p) => {
-      const boundCallback = callback.metadata?.bind(p);
-      if (boundCallback) boundCallback!({ metadataUpdated: { key, value }, parameter: p });
-      p.__metadataListeners__.forEach(l => {
-        l.bind(this);
-        l!({ metadataUpdated: { key, value }, parameter: p });
+    if (this._metadata.get(key) !== value) {
+      this._metadata.set(key, value);
+      this._bound.forEach((callback, p) => {
+        const boundCallback = callback.metadata?.bind(p);
+        if (boundCallback) boundCallback!({ metadataUpdated: { key, value }, parameter: p });
+        p.__metadataListeners__.forEach(l => {
+          l.bind(this);
+          l!({ metadataUpdated: { key, value }, parameter: p });
+        });
       });
-    });
+    }
   }
 
   setMetadataSeveral(token: string, metadata: Record<string, any>, secretly?: boolean) {
+    let changes = false;
     for (const [key, value] of Object.entries(metadata)) {
-      this._metadata.set(key, value);
+      if (this._metadata.get(key) !== value) {
+        this._metadata.set(key, value);
+        changes = true;
+      }
     }
-    if (!secretly) {
+    if (!secretly && changes) {
       this._bound.forEach((callback, p) => {
         const boundCallback = callback.metadata?.bind(p);
         if (boundCallback) boundCallback!({ metadataUpdated: { key: token, value: true }, parameter: p });
