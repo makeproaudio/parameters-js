@@ -76,35 +76,41 @@ export class Synapse {
     return this._metadata;
   }
 
-  setMetadata(key: string, value: any) {
-    if (this._metadata.get(key) !== value) {
+  setMetadata(key: string, value: any, listenerUpdate: undefined | boolean = undefined) {
+    if (this._metadata.get(key) !== value || listenerUpdate === true) {
       this._metadata.set(key, value);
-      this._bound.forEach((callback, p) => {
-        const boundCallback = callback.metadata?.bind(p);
-        if (boundCallback) boundCallback!({ metadataUpdated: { key, value }, parameter: p });
-        p.__metadataListeners__.forEach(l => {
-          l.bind(this);
-          l!({ metadataUpdated: { key, value }, parameter: p });
+      if (listenerUpdate !== false) {
+        this._bound.forEach((callback, p) => {
+          const boundCallback = callback.metadata?.bind(p);
+          if (boundCallback) boundCallback!({ metadataUpdated: { key, value }, parameter: p });
+          p.__metadataListeners__.forEach(l => {
+            l.bind(this);
+            l!({ metadataUpdated: { [key]: value }, parameter: p });
+          });
         });
-      });
+      }
     }
   }
 
-  setMetadataSeveral(token: string, metadata: Record<string, any>, secretly?: boolean) {
+  setMetadataSeveral(metadata: Record<string, any>, listenerUpdate: undefined | boolean = undefined) {
     let changes = false;
+    const metadataUpdated = {};
     for (const [key, value] of Object.entries(metadata)) {
       if (this._metadata.get(key) !== value) {
         this._metadata.set(key, value);
         changes = true;
+        metadataUpdated[key] = value;
+      } else if (listenerUpdate === true) {
+        metadataUpdated[key] = value;
       }
     }
-    if (!secretly && changes) {
+    if (listenerUpdate !== false && (listenerUpdate === true || changes)) {
       this._bound.forEach((callback, p) => {
         const boundCallback = callback.metadata?.bind(p);
-        if (boundCallback) boundCallback!({ metadataUpdated: { key: token, value: true }, parameter: p });
+        if (boundCallback) boundCallback!({ metadataUpdated, parameter: p });
         p.__metadataListeners__.forEach(l => {
           l.bind(this);
-          l!({ metadataUpdated: { key: token, value: true }, parameter: p });
+          l!({ metadataUpdated, parameter: p });
         });
       });
     }
@@ -114,10 +120,10 @@ export class Synapse {
     this._metadata.delete(key);
     this._bound.forEach((callback, p) => {
       const boundCallback = callback.metadata?.bind(p);
-      if (boundCallback) boundCallback!({ metadataRemoved: { key }, parameter: p });
+      if (boundCallback) boundCallback!({ metadataRemoved: [key], parameter: p });
       p.__metadataListeners__.forEach(l => {
         l.bind(this);
-        l!({ metadataRemoved: { key }, parameter: p });
+        l!({ metadataRemoved: [key], parameter: p });
       });
     });
   }

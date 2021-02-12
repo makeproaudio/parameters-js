@@ -8,10 +8,7 @@ export interface ParameterValueChangeEvent<T> {
 export interface ParameterMetadataChangeEvent<T> {
     parameter: Parameter<T>;
     metadataUpdated?: {
-        key: string;
-        value: any;
+        [key: string]: any;
     };
-    metadataRemoved?: {
-        key: string;
-    };
+    metadataRemoved?: string[];
 }

@@ -113,76 +113,76 @@ export class SuperParameter extends Parameter<any> {
         if (req.type === ParameterType.STRING || req.type === ParameterType.BOOLEAN) this.setValueSpecific(req.value, secretly);
     }
 
-    private setMinMaxStep(min: number, max: number, step: number, value: number, secretly?: boolean): any {
+    private setMinMaxStep(min: number, max: number, step: number, value: number, listenerUpdate: undefined | boolean = undefined): any {
         this.setMetadata('type', ParameterType.NUMBER);
-        this.setMetadataSeveral(SuperParameterTypeChangeRequestToken, { type: this.type, min, max, step }, secretly);
+        this.setMetadataSeveral({ [SuperParameterTypeChangeRequestToken]: true, type: this.type, min, max, step }, listenerUpdate);
         return this.update(value);
     }
 
-    private setValues(values: any[], value: any, secretly?: boolean): any {
+    private setValues(values: any[], value: any, listenerUpdate: undefined | boolean = undefined): any {
         if (typeof values[0] === 'number') this.setMetadata('type', ParameterType.NUMBER_ARRAY);
         else if (typeof values[0] === 'string') this.setMetadata('type', ParameterType.STRING_ARRAY);
-        this.setMetadataSeveral(SuperParameterTypeChangeRequestToken, { type: this.type, min: undefined, max: undefined, step: undefined, values }, secretly);
+        this.setMetadataSeveral({ [SuperParameterTypeChangeRequestToken]: true, type: this.type, min: undefined, max: undefined, step: undefined, values }, listenerUpdate);
         return this.update(value);
     }
 
-    private setValueSpecific(value: string | boolean, secretly?: boolean): any {
+    private setValueSpecific(value: string | boolean, listenerUpdate: undefined | boolean = undefined): any {
         if (typeof value === 'string') this.setMetadata('type', ParameterType.STRING);
         else if (typeof value === 'boolean') this.setMetadata('type', ParameterType.BOOLEAN);
-        this.setMetadataSeveral(SuperParameterTypeChangeRequestToken, { type: this.type, min: undefined, max: undefined, step: undefined, values: undefined }, secretly);
+        this.setMetadataSeveral({ [SuperParameterTypeChangeRequestToken]: true, type: this.type, min: undefined, max: undefined, step: undefined, values: undefined }, listenerUpdate);
         return this.update(value);
     }
 
     /* The SuperParameter ecosystem provides more convenient ways to update the value of a Parameter.
      * Depending on the current type of the Parameter, updateCyclic could do one of several things */
-    updateCyclic(): any {
-        if (this.type === ParameterType.STRING) this.update(this.value, true);
+    updateCyclic(listenerUpdate: undefined | boolean = undefined): any {
+        if (this.type === ParameterType.STRING) this.update(this.value, listenerUpdate);
         if ((this.type === ParameterType.NUMBER_ARRAY || this.type === ParameterType.STRING_ARRAY) && this.possibleValues) {
             const currIndex = this.possibleValues!.indexOf(this.value);
             const indexToSet = (currIndex + 1) % this.possibleValues!.length;
-            return this.update(this.possibleValues![indexToSet], true);
+            return this.update(this.possibleValues![indexToSet], listenerUpdate);
         }
-        if (this.type === ParameterType.BOOLEAN) this.update(!this.value);
+        if (this.type === ParameterType.BOOLEAN) this.update(!this.value, listenerUpdate);
         if (this.type === ParameterType.NUMBER) {
             const nextValue = (this.value as number) + this.step!;
             if (nextValue > this.max!) {
-                this.update(this.min!);
+                this.update(this.min!, listenerUpdate);
             } else {
-                this.update(nextValue);
+                this.update(nextValue, listenerUpdate);
             }
         }
     }
 
-    updateNext(jumps: number): any {
-        if (this.type === ParameterType.STRING) this.update(this.value, true);
+    updateNext(jumps: number, listenerUpdate: undefined | boolean = undefined): any {
+        if (this.type === ParameterType.STRING) this.update(this.value, listenerUpdate);
         if ((this.type === ParameterType.NUMBER_ARRAY || this.type === ParameterType.STRING_ARRAY) && this.possibleValues!) {
             const currIndex = this.possibleValues!.indexOf(this.value);
             const indexToSet = Math.min(currIndex + 1, this.possibleValues!.length - 1);
-            return this.update(this.possibleValues![indexToSet], true);
+            return this.update(this.possibleValues![indexToSet], listenerUpdate);
         }
-        if (this.type === ParameterType.BOOLEAN) this.update(false);
+        if (this.type === ParameterType.BOOLEAN) this.update(!this.value, listenerUpdate);
         if (this.type === ParameterType.NUMBER) this.update(Math.round((this.value as number) + this.step! * jumps));
     }
 
-    updatePrevious(jumps: number): any {
-        if (this.type === ParameterType.STRING) this.update(this.value, true);
+    updatePrevious(jumps: number, listenerUpdate: undefined | boolean = undefined): any {
+        if (this.type === ParameterType.STRING) this.update(this.value, listenerUpdate);
         if ((this.type === ParameterType.NUMBER_ARRAY || this.type === ParameterType.STRING_ARRAY) && this.possibleValues!) {
             const currIndex = this.possibleValues!.indexOf(this.value);
             const indexToSet = Math.max(currIndex - 1, 0);
-            return this.update(this.possibleValues![indexToSet], true);
+            return this.update(this.possibleValues![indexToSet], listenerUpdate);
         }
-        if (this.type === ParameterType.BOOLEAN) this.update(true);
-        if (this.type === ParameterType.NUMBER) this.update(Math.round((this.value as number) - this.step! * jumps));
+        if (this.type === ParameterType.BOOLEAN) this.update(!this.value, listenerUpdate);
+        if (this.type === ParameterType.NUMBER) this.update(Math.round((this.value as number) - this.step! * jumps), listenerUpdate);
     }
 
     /* This overrides the standard update method of the Parameter by adding a few checks before making the update */
-    update(newVal: string | boolean | number, forceListenerUpdate?: boolean): any {
+    update(newVal: string | boolean | number, listenerUpdate: undefined | boolean = undefined): any {
         if (this.type === ParameterType.NUMBER) {
             let valToSend: number;
             if (newVal < this.min!) valToSend = this.min!;
             else if (newVal > this.max!) valToSend = this.max!;
             else valToSend = newVal as number;
-            return super.update(valToSend, forceListenerUpdate);
+            return super.update(valToSend, listenerUpdate);
         } else if (this.type === ParameterType.NUMBER_ARRAY && this.possibleValues!) {
             if (this.possibleValues!.indexOf(newVal) < 0) {
                 //bad update - return existing value
@@ -194,7 +194,7 @@ export class SuperParameter extends Parameter<any> {
                 return super.value;
             }
         }
-        super.update(newVal, forceListenerUpdate);
+        super.update(newVal, listenerUpdate);
     }
 
     /* incoming range must be between 0 and 1 */
@@ -213,7 +213,7 @@ export class SuperParameter extends Parameter<any> {
         this.updateType(other.blueprint, true);
         try {
             super.bindFrom(other, valueCallback, metadataCallback);
-            this.setMetadataSeveral(BindFromRequestToken, (Object as any).fromEntries(other.getAllMetadata()), false);
+            this.setMetadataSeveral(Object.assign((Object as any).fromEntries(other.getAllMetadata()), { [BindFromRequestToken]: true }), false);
         } catch (err) {
             this.updateType(currBlueprint, true);
         }

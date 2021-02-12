@@ -65,9 +65,9 @@ export abstract class Parameter<T> {
     this.doUpdate(value);
   }
 
-  private doUpdate(newValue: T, forceListenerUpdate?: boolean): T {
+  private doUpdate(newValue: T, listenerUpdate: undefined | boolean = undefined): T {
     const dest = Synapses.of(this);
-    const updatedValue = dest.update(newValue, forceListenerUpdate);
+    const updatedValue = dest.update(newValue, listenerUpdate);
     return updatedValue;
   }
 
@@ -84,14 +84,14 @@ export abstract class Parameter<T> {
     Synapses.of(this).setMetadata("color", color);
   }
 
-  setMetadata(key: string, value: any) {
+  setMetadata(key: string, value: any, listenerUpdate: undefined | boolean = undefined) {
     const dest = Synapses.of(this);
-    dest.setMetadata(key, value);
+    dest.setMetadata(key, value, listenerUpdate);
   }
 
-  setMetadataSeveral(token: string, metadata: Record<string, any>, secretly?: boolean) {
+  setMetadataSeveral(metadata: Record<string, any>, listenerUpdate: undefined | boolean = undefined) {
     const dest = Synapses.of(this);
-    dest.setMetadataSeveral(token, metadata, secretly);
+    dest.setMetadataSeveral(metadata, listenerUpdate);
   }
 
   removeMetadata(key: string) {
@@ -109,8 +109,8 @@ export abstract class Parameter<T> {
     return dest.getAllMetadata();
   }
 
-  update(newValue: T, forceListenerUpdate?: boolean): T {
-    return this.doUpdate(newValue, forceListenerUpdate);
+  update(newValue: T, listenerUpdate: undefined | boolean = undefined): T {
+    return this.doUpdate(newValue, listenerUpdate);
   }
 
   get bound(): boolean {
