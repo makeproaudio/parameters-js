@@ -213,7 +213,7 @@ export class SuperParameter extends Parameter<any> {
         this.updateType(other.blueprint, true);
         try {
             super.bindFrom(other, valueCallback, metadataCallback);
-            this.setMetadataSeveral(Object.assign((Object as any).fromEntries(other.getAllMetadata()), { [BindFromRequestToken]: true }), false);
+            this.setMetadataSeveral(Object.assign((Object as any).fromEntries(other.getAllMetadata()), { [BindFromRequestToken]: true }), true);
         } catch (err) {
             this.updateType(currBlueprint, true);
         }
