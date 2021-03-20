@@ -77,6 +77,18 @@ export abstract class Parameter<T> {
   set label(label: string) {
     Synapses.of(this).setMetadata("label", label);
   }
+  get context(): string {
+    return Synapses.of(this).getMetadata("context");
+  }
+  set context(context: string) {
+    Synapses.of(this).setMetadata("context", context);
+  }
+  get preferredUIWidget(): any {
+    return Synapses.of(this).getMetadata("preferredUIWidget");
+  }
+  set preferredUIWidget(preferredUIWidget: any) {
+    Synapses.of(this).setMetadata("preferredUIWidget", preferredUIWidget);
+  }
   get color(): string {
     return Synapses.of(this).getMetadata("color");
   }
