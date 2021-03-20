@@ -14,9 +14,13 @@ import { SuperParameter } from './parameter-types/SuperParameter';
 import { ParameterBlueprint } from './models/ParameterBlueprint';
 import { ParameterType } from './models/ParameterType';
 import { SuperParameterTypeChangeRequestToken, BindFromRequestToken } from './models/RequestTokens';
+import { ContinuousParameter } from './parameters/ContinuousParameter';
+import { SelectorParameter } from './parameters/SelectorParameter';
+import { SwitchParameter } from './parameters/SwitchParameter';
 
 export { Parameters };
 export { Parameter, SuperParameter, BooleanParameter, NumberParameter, StringParameter, StringArrayParameter, IntegerArrayParameter, ArrayParameter };
+export { ContinuousParameter, SelectorParameter, SwitchParameter };
 export { ParameterType, SuperParameterTypeChangeRequestToken, ParameterBlueprint, BindFromRequestToken };
 export { ParameterValueChangeEvent, ParameterMetadataChangeEvent };
 export { getSynapsesManager, setSynapsesManager };
