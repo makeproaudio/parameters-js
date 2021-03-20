@@ -10,6 +10,6 @@ export class IntegerArrayParameter extends ArrayParameter<number> {
     }
 
     get blueprint(): ParameterBlueprint {
-        return { type: this.type, values: this.getMetadata("possibleValues"), value: this.value };
+        return { type: this.type, values: this.getMetadata("values"), value: this.value };
     }
 }
