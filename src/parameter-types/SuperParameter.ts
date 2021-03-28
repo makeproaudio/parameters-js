@@ -190,7 +190,8 @@ export class SuperParameter extends Parameter<any> {
             const indexToSet = Math.min(currIndex + 1, this.possibleValues!.length - 1);
             return this.update(this.possibleValues![indexToSet], listenerUpdate);
         }
-        if (this.type === ParameterType.BOOLEAN || this.type == ParameterType.SWITCH) this.update(!this.value, listenerUpdate);
+        if (this.type === ParameterType.BOOLEAN) this.update(!this.value, listenerUpdate);
+        if (this.type == ParameterType.SWITCH) this.update(true, listenerUpdate);
         if (this.type === ParameterType.NUMBER || this.type == ParameterType.CONTINUOUS) this.update(Math.round((this.value as number) + this.step! * jumps));
     }
 
@@ -201,7 +202,8 @@ export class SuperParameter extends Parameter<any> {
             const indexToSet = Math.max(currIndex - 1, 0);
             return this.update(this.possibleValues![indexToSet], listenerUpdate);
         }
-        if (this.type === ParameterType.BOOLEAN || this.type == ParameterType.SWITCH) this.update(!this.value, listenerUpdate);
+        if (this.type === ParameterType.BOOLEAN) this.update(!this.value, listenerUpdate);
+        if (this.type == ParameterType.SWITCH) this.update(false, listenerUpdate);
         if (this.type === ParameterType.NUMBER || this.type == ParameterType.CONTINUOUS) this.update(Math.round((this.value as number) - this.step! * jumps), listenerUpdate);
     }
 
