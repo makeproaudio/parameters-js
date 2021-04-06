@@ -231,7 +231,6 @@ export class SuperParameter extends Parameter<any> {
         let rounded = 0;
         if (valToSend > 0) rounded = Math.ceil(valToSend / this.step!) * this.step!;
         else if (valToSend < 0) rounded = Math.floor(valToSend / this.step!) * this.step!;
-        else rounded = this.step!;
         super.update(rounded);
     }
 
