@@ -1,7 +1,7 @@
-import { ParameterMetadataChangeEvent, Parameters, SuperParameterType, ParameterValueChangeEvent } from "../src";
+import { KnownParameterMetadata, ParameterMetadataChangeEvent, Parameters, ParameterType, ParameterValueChangeEvent } from "../src";
 
 const p1 = Parameters.newParameter('', 'p1');
-p1.updateType({ type: SuperParameterType.NUMBER, min: 100, max: 200, step: 1, value: 150 });
+p1.updateType({ [KnownParameterMetadata.TYPE]: ParameterType.NUMBER, [KnownParameterMetadata.MIN]: 100, [KnownParameterMetadata.MAX]: 200, [KnownParameterMetadata.STEP]: 1, value: 150 });
 p1.setMetadata('non-classified-key', 'non-classified-value');
 
 p1.addValueListener((e: ParameterValueChangeEvent<any>) => {
@@ -14,7 +14,7 @@ p1.addMetadataListener((e: ParameterMetadataChangeEvent<any>) => {
 setInterval(() => p1.updateCyclic(), 1000);
 
 const p2 = Parameters.newParameter('', 'p2');
-p2.updateType({ type: SuperParameterType.STRING_ARRAY, values: ['a', 'b'], value: 'a' });
+p2.updateType({ [KnownParameterMetadata.TYPE]: ParameterType.STRING_ARRAY, [KnownParameterMetadata.VALUES]: ['a', 'b'], value: 'a' });
 
 const p2L = (e: ParameterValueChangeEvent<any>) => {
   console.log(`p2->p1:`, e.value);

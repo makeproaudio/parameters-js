@@ -1,5 +1,6 @@
+import { KnownParameterMetadata } from "../models/KnownParameterMetadata";
 import { Parameter } from "../base/Parameter";
-import { ParameterValueChangeEvent, ParameterMetadataChangeEvent } from '../Events';
+import { ParameterValueChangeEvent, ParameterMetadataChangeEvent } from '../models/Events';
 import { ParameterBlueprint } from '../models/ParameterBlueprint';
 import { ParameterType } from '../models/ParameterType';
 
@@ -7,20 +8,26 @@ export class ContinuousParameter extends Parameter<number> {
 
     constructor(initValue: number, min: number, max: number, step: number, id: string, valueChangeCallback?: (e: ParameterValueChangeEvent<any>) => void, metadataChangeCallback?: (e: ParameterMetadataChangeEvent<any>) => void) {
         super(initValue, id, valueChangeCallback, metadataChangeCallback);
-        this.setMetadata("type", ParameterType.CONTINUOUS);
-        this.setMetadata("step", step);
-        this.setMetadata("max", max);
-        this.setMetadata("min", min);
+        this.setMetadata(KnownParameterMetadata.TYPE, ParameterType.CONTINUOUS);
+        this.setMetadata(KnownParameterMetadata.STEP, step);
+        this.setMetadata(KnownParameterMetadata.MAX, max);
+        this.setMetadata(KnownParameterMetadata.MIN, min);
     }
 
     get blueprint(): ParameterBlueprint {
-        return { type: this.type, max: this.getMetadata("max"), min: this.getMetadata("min"), step: this.getMetadata("step"), value: this.value };
+        return {
+            [KnownParameterMetadata.TYPE]: this.type,
+            [KnownParameterMetadata.MAX]: this.getMetadata(KnownParameterMetadata.MAX),
+            [KnownParameterMetadata.MIN]: this.getMetadata(KnownParameterMetadata.MIN),
+            [KnownParameterMetadata.STEP]: this.getMetadata(KnownParameterMetadata.STEP),
+            value: this.value
+        };
     }
 
     update(newVal: number): number {
         let valToSend: number;
-        if (newVal < this.getMetadata("min")) valToSend = this.getMetadata("min");
-        else if (newVal > this.getMetadata("max")) valToSend = this.getMetadata("max");
+        if (newVal < this.getMetadata(KnownParameterMetadata.MIN)) valToSend = this.getMetadata(KnownParameterMetadata.MIN);
+        else if (newVal > this.getMetadata(KnownParameterMetadata.MAX)) valToSend = this.getMetadata(KnownParameterMetadata.MAX);
         else valToSend = newVal;
         return super.update(valToSend);
     }

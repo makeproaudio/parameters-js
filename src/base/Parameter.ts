@@ -1,8 +1,9 @@
 import { Synapses } from '../synapses/synapses';
 import { Synapse } from '../synapses/synapse';
-import { ParameterValueChangeEvent, ParameterMetadataChangeEvent } from '../Events';
+import { ParameterValueChangeEvent, ParameterMetadataChangeEvent } from '../models/Events';
 import { ParameterBlueprint } from '../models/ParameterBlueprint';
 import { ParameterType } from '../models/ParameterType';
+import { KnownParameterMetadata } from '../models/KnownParameterMetadata';
 
 /* As seen over here, the Parameter does not hold the Metadata or the Value. The Synapse is responsible for that
  */
@@ -34,7 +35,7 @@ export abstract class Parameter<T> {
   }
 
   get type(): ParameterType {
-    return this.getMetadata('type');
+    return this.getMetadata(KnownParameterMetadata.TYPE);
   }
 
   __default__(): Synapse {
@@ -72,28 +73,28 @@ export abstract class Parameter<T> {
   }
 
   get label(): string {
-    return Synapses.of(this).getMetadata("label");
+    return Synapses.of(this).getMetadata(KnownParameterMetadata.LABEL);
   }
   set label(label: string) {
-    Synapses.of(this).setMetadata("label", label);
+    Synapses.of(this).setMetadata(KnownParameterMetadata.LABEL, label);
   }
   get context(): string {
-    return Synapses.of(this).getMetadata("context");
+    return Synapses.of(this).getMetadata(KnownParameterMetadata.CONTEXT);
   }
   set context(context: string) {
-    Synapses.of(this).setMetadata("context", context);
+    Synapses.of(this).setMetadata(KnownParameterMetadata.CONTEXT, context);
   }
   get preferredUIWidget(): any {
-    return Synapses.of(this).getMetadata("preferredUIWidget");
+    return Synapses.of(this).getMetadata(KnownParameterMetadata.PREFERRED_UI_WIDGET);
   }
   set preferredUIWidget(preferredUIWidget: any) {
-    Synapses.of(this).setMetadata("preferredUIWidget", preferredUIWidget);
+    Synapses.of(this).setMetadata(KnownParameterMetadata.PREFERRED_UI_WIDGET, preferredUIWidget);
   }
   get color(): string {
-    return Synapses.of(this).getMetadata("color");
+    return Synapses.of(this).getMetadata(KnownParameterMetadata.COLOR);
   }
   set color(color: string) {
-    Synapses.of(this).setMetadata("color", color);
+    Synapses.of(this).setMetadata(KnownParameterMetadata.COLOR, color);
   }
 
   setMetadata(key: string, value: any, listenerUpdate: undefined | boolean = undefined) {

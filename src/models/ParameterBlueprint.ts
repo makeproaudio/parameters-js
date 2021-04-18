@@ -1,10 +1,11 @@
+import { KnownParameterMetadata } from "./KnownParameterMetadata";
 import { ParameterType } from "./ParameterType";
 
 export interface ParameterBlueprint {
-    type: ParameterType;
-    min?: number;
-    max?: number;
-    step?: number;
     value: any;
-    values?: any[];
+    [KnownParameterMetadata.TYPE]: ParameterType;
+    [KnownParameterMetadata.MIN]?: number;
+    [KnownParameterMetadata.MAX]?: number;
+    [KnownParameterMetadata.STEP]?: number;
+    [KnownParameterMetadata.VALUES]?: any[];
 }

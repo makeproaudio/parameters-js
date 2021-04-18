@@ -1,49 +1,50 @@
 import { SuperParameterTypeChangeRequestToken, BindFromRequestToken } from "../models/RequestTokens";
 import { ParameterType } from "../models/ParameterType";
 import { Parameter } from "../base/Parameter";
-import { ParameterValueChangeEvent, ParameterMetadataChangeEvent } from '../Events';
+import { ParameterValueChangeEvent, ParameterMetadataChangeEvent } from '../models/Events';
 import { ParameterBlueprint } from "../models/ParameterBlueprint";
+import { KnownParameterMetadata } from "../models/KnownParameterMetadata";
 
 /* The Super Parameter works on a few pre-defined conventions*/
 export class SuperParameter extends Parameter<any> {
 
     get min(): number | undefined {
-        return this.getMetadata('min');
+        return this.getMetadata(KnownParameterMetadata.MIN);
     }
 
     get max(): number | undefined {
-        return this.getMetadata('max');
+        return this.getMetadata(KnownParameterMetadata.MAX);
     }
 
     get step(): number | undefined {
-        return this.getMetadata('step');
+        return this.getMetadata(KnownParameterMetadata.STEP);
     }
 
     get possibleValues(): any[] | undefined {
-        return this.getMetadata('values');
+        return this.getMetadata(KnownParameterMetadata.VALUES);
     }
 
     get blueprint(): ParameterBlueprint {
         switch (this.type) {
             case ParameterType.BOOLEAN:
-                return { type: this.type, value: this.value };
+                return { [KnownParameterMetadata.TYPE]: this.type, value: this.value };
             case ParameterType.NUMBER:
-                return { type: this.type, max: this.max, min: this.min, step: this.step, value: this.value };
+                return { [KnownParameterMetadata.TYPE]: this.type, [KnownParameterMetadata.MAX]: this.max, [KnownParameterMetadata.MIN]: this.min, [KnownParameterMetadata.STEP]: this.step, value: this.value };
             case ParameterType.NUMBER_ARRAY:
-                return { type: this.type, values: this.possibleValues, value: this.value };
+                return { [KnownParameterMetadata.TYPE]: this.type, [KnownParameterMetadata.VALUES]: this.possibleValues, value: this.value };
             case ParameterType.STRING:
-                return { type: this.type, value: this.value };
+                return { [KnownParameterMetadata.TYPE]: this.type, value: this.value };
             case ParameterType.STRING_ARRAY:
-                return { type: this.type, values: this.possibleValues, value: this.value };
+                return { [KnownParameterMetadata.TYPE]: this.type, [KnownParameterMetadata.VALUES]: this.possibleValues, value: this.value };
             // highlevel parameters
             case ParameterType.SELECTOR:
-                return { type: this.type, values: this.possibleValues, value: this.value };
+                return { [KnownParameterMetadata.TYPE]: this.type, [KnownParameterMetadata.VALUES]: this.possibleValues, value: this.value };
             case ParameterType.CONTINUOUS:
-                return { type: this.type, max: this.max, min: this.min, step: this.step, value: this.value };
+                return { [KnownParameterMetadata.TYPE]: this.type, [KnownParameterMetadata.MAX]: this.max, [KnownParameterMetadata.MIN]: this.min, [KnownParameterMetadata.STEP]: this.step, value: this.value };
             case ParameterType.SWITCH:
-                return { type: this.type, value: this.value };
+                return { [KnownParameterMetadata.TYPE]: this.type, value: this.value };
             default:
-                return { type: this.type, value: this.value };
+                return { [KnownParameterMetadata.TYPE]: this.type, value: this.value };
         }
     }
 
@@ -52,7 +53,7 @@ export class SuperParameter extends Parameter<any> {
     the process of creation simplistic */
     constructor(id: string, valueChangeCallback?: (e: ParameterValueChangeEvent<any>) => void, metadataChangeCallback?: (e: ParameterMetadataChangeEvent<any>) => void) {
         super(false, id, valueChangeCallback, metadataChangeCallback);
-        this.setMetadata('type', ParameterType.SWITCH);
+        this.setMetadata(KnownParameterMetadata.TYPE, ParameterType.SWITCH);
     }
 
     private areAllOfSameType(arr: any[], type: string) {
@@ -66,67 +67,75 @@ export class SuperParameter extends Parameter<any> {
     /* There are several constraints to be supplied when attempting to update the type of a SuperParameter
      * This is captured here in this method*/
     private validateParameterTypeChangeRequest(req: ParameterBlueprint): boolean {
-        switch (req.type) {
+        switch (req.TYPE) {
             case ParameterType.BOOLEAN:
-                if (req.max === undefined && req.min === undefined && req.step === undefined && req.values === undefined) {
+                if (req.MAX === undefined && req.MIN === undefined && req.STEP === undefined && req.VALUES === undefined) {
                     if (typeof req.value === 'boolean') {
                         return true;
                     }
                 }
+                console.log("a");
                 return false;
             case ParameterType.NUMBER:
-                if (req.max !== undefined && req.min !== undefined && req.step !== undefined && req.values === undefined) {
+                if (req.MAX !== undefined && req.MIN !== undefined && req.STEP !== undefined && req.VALUES === undefined) {
                     if (typeof req.value === 'number') {
                         return true;
                     }
                 }
+                console.log("b");
                 return false;
             case ParameterType.NUMBER_ARRAY:
-                if (req.max === undefined && req.min === undefined && req.step === undefined && req.values !== undefined) {
-                    if (req.values.length > 0) {
-                        if (this.areAllOfSameType(req.values, 'number')) {
+                if (req.MAX === undefined && req.MIN === undefined && req.STEP === undefined && req.VALUES !== undefined) {
+                    if (req.VALUES.length > 0) {
+                        if (this.areAllOfSameType(req.VALUES, 'number')) {
                             return true;
                         }
                     }
                 }
+                console.log("c");
                 return false;
             case ParameterType.STRING:
-                if (req.max === undefined && req.min === undefined && req.step === undefined && req.values === undefined) {
+                if (req.MAX === undefined && req.MIN === undefined && req.STEP === undefined && req.VALUES === undefined) {
                     if (typeof req.value === 'string') {
                         return true;
                     }
                 }
+                console.log("d");
                 return false;
             case ParameterType.STRING_ARRAY:
-                if (req.max === undefined && req.min === undefined && req.step === undefined && req.values !== undefined) {
-                    if (req.values.length > 0) {
-                        if (this.areAllOfSameType(req.values, 'string')) {
+                if (req.MAX === undefined && req.MIN === undefined && req.STEP === undefined && req.VALUES !== undefined) {
+                    if (req.VALUES.length > 0) {
+                        if (this.areAllOfSameType(req.VALUES, 'string')) {
                             return true;
                         }
                     }
                 }
+                console.log("e");
                 return false;
             // highlevel parameters
             case ParameterType.CONTINUOUS:
-                if (req.max !== undefined && req.min !== undefined && req.step !== undefined && req.values === undefined) {
+                if (req.MAX !== undefined && req.MIN !== undefined && req.STEP !== undefined && req.VALUES === undefined) {
                     if (typeof req.value === 'number') {
                         return true;
                     }
                 }
+                console.log("f");
                 return false;
             case ParameterType.SELECTOR:
-                if (req.max === undefined && req.min === undefined && req.step === undefined && req.values !== undefined) {
-                    if (req.values.length > 0) {
+                if (req.MAX === undefined && req.MIN === undefined && req.STEP === undefined && req.VALUES !== undefined) {
+                    if (req.VALUES.length > 0) {
                         return true;
                     }
                 }
+                console.log("g");
                 return false;
             case ParameterType.SWITCH:
-                if (req.max === undefined && req.min === undefined && req.step === undefined && req.values === undefined) {
+                if (req.MAX === undefined && req.MIN === undefined && req.STEP === undefined && req.VALUES === undefined) {
                     if (typeof req.value === 'boolean') {
                         return true;
                     }
                 }
+                console.log("h");
                 return false;
             default:
                 return false;
@@ -137,29 +146,49 @@ export class SuperParameter extends Parameter<any> {
      * A standard usage would encompass creating a SuperParameter and then immediately updating its type */
     updateType(req: ParameterBlueprint, secretly?: boolean) {
         if (!this.validateParameterTypeChangeRequest(req)) throw new Error('cannot update type due to validation failure');
-        this.setMetadata("type", req.type);
-        if (req.type === ParameterType.NUMBER) this.setMinMaxStep(req.min!, req.max!, req.step!, req.value, secretly);
-        if (req.type === ParameterType.NUMBER_ARRAY || req.type === ParameterType.STRING_ARRAY) this.setValues(req.values!, req.value, secretly);
-        if (req.type === ParameterType.STRING || req.type === ParameterType.BOOLEAN) this.setValueSpecific(req.value, secretly);
+        this.setMetadata(KnownParameterMetadata.TYPE, req.TYPE);
+        if (req.TYPE === ParameterType.NUMBER) this.setMinMaxStep(req.MIN!, req.MAX!, req.STEP!, req.value, secretly);
+        if (req.TYPE === ParameterType.NUMBER_ARRAY || req.TYPE === ParameterType.STRING_ARRAY) this.setValues(req.VALUES!, req.value, secretly);
+        if (req.TYPE === ParameterType.STRING || req.TYPE === ParameterType.BOOLEAN) this.setValueSpecific(req.value, secretly);
         // highlevel parameters
-        if (req.type === ParameterType.CONTINUOUS) this.setMinMaxStep(req.min!, req.max!, req.step!, req.value, secretly);
-        if (req.type === ParameterType.SELECTOR) this.setValues(req.values!, req.value, secretly);
-        if (req.type === ParameterType.SWITCH) this.setValueSpecific(req.value, secretly);
+        if (req.TYPE === ParameterType.CONTINUOUS) this.setMinMaxStep(req.MIN!, req.MAX!, req.STEP!, req.value, secretly);
+        if (req.TYPE === ParameterType.SELECTOR) this.setValues(req.VALUES!, req.value, secretly);
+        if (req.TYPE === ParameterType.SWITCH) this.setValueSpecific(req.value, secretly);
 
     }
 
     private setMinMaxStep(min: number, max: number, step: number, value: number, listenerUpdate: undefined | boolean = undefined): any {
-        this.setMetadataSeveral({ [SuperParameterTypeChangeRequestToken]: true, type: this.type, min, max, step }, listenerUpdate);
+        this.setMetadataSeveral({
+            [SuperParameterTypeChangeRequestToken]: true,
+            [KnownParameterMetadata.TYPE]: this.type,
+            [KnownParameterMetadata.MIN]: min,
+            [KnownParameterMetadata.MAX]: max,
+            [KnownParameterMetadata.STEP]: step
+        }, listenerUpdate);
         return this.update(value);
     }
 
     private setValues(values: any[], value: any, listenerUpdate: undefined | boolean = undefined): any {
-        this.setMetadataSeveral({ [SuperParameterTypeChangeRequestToken]: true, type: this.type, min: undefined, max: undefined, step: undefined, values }, listenerUpdate);
+        this.setMetadataSeveral({
+            [SuperParameterTypeChangeRequestToken]: true,
+            [KnownParameterMetadata.TYPE]: this.type,
+            [KnownParameterMetadata.MIN]: undefined,
+            [KnownParameterMetadata.MAX]: undefined,
+            [KnownParameterMetadata.STEP]: undefined,
+            [KnownParameterMetadata.VALUES]: values,
+        }, listenerUpdate);
         return this.update(value);
     }
 
     private setValueSpecific(value: string | boolean, listenerUpdate: undefined | boolean = undefined): any {
-        this.setMetadataSeveral({ [SuperParameterTypeChangeRequestToken]: true, type: this.type, min: undefined, max: undefined, step: undefined, values: undefined }, listenerUpdate);
+        this.setMetadataSeveral({
+            [SuperParameterTypeChangeRequestToken]: true,
+            [KnownParameterMetadata.TYPE]: this.type,
+            [KnownParameterMetadata.MIN]: undefined,
+            [KnownParameterMetadata.MAX]: undefined,
+            [KnownParameterMetadata.STEP]: undefined,
+            [KnownParameterMetadata.VALUES]: undefined,
+        }, listenerUpdate);
         return this.update(value);
     }
 
