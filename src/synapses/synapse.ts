@@ -1,12 +1,17 @@
 import { Parameter } from '../base/Parameter';
 import { v4 as uuid } from 'uuid';
-import { ParameterValueChangeEvent, ParameterMetadataChangeEvent } from '../Events';
+import { ParameterValueChangeEvent, ParameterMetadataChangeEvent } from '../models/Events';
 
-type Callbacks = { value?: (parameterChangeEvent: ParameterValueChangeEvent<any>) => void, metadata?: (parameterChangeEvent: ParameterMetadataChangeEvent<any>) => void };
+type Callbacks = {
+  value?: (parameterChangeEvent: ParameterValueChangeEvent<any>) => void,
+  relativeValue?: (parameterChangeEvent: ParameterValueChangeEvent<any>) => void,
+  metadata?: (parameterChangeEvent: ParameterMetadataChangeEvent<any>) => void,
+};
 /* The Synapse should have the true value. Parameters bound to the same synapse should 'request' 
 the synapse to make an update*/
 export class Synapse {
   _value: any;
+  _relativeValue: any;
 
   /* */
   _uuid: string;
@@ -33,12 +38,12 @@ export class Synapse {
     return this._bound.get(param);
   }
 
-  set(param: Parameter<any>, valueCb?: (parameterChangeEvent: ParameterValueChangeEvent<any>) => void, metadataCb?: (parameterChangeEvent: ParameterMetadataChangeEvent<any>) => void) {
+  set(param: Parameter<any>, valueCb?: (parameterChangeEvent: ParameterValueChangeEvent<any>) => void, metadataCb?: (parameterChangeEvent: ParameterMetadataChangeEvent<any>) => void, relativeValueCb?: (parameterChangeEvent: ParameterValueChangeEvent<any>) => void) {
     let callback = this._bound.get(param);
     if (callback !== undefined) {
       throw `${param.id} already has callback attached in associated Synapse`;
     }
-    this._bound.set(param, { value: valueCb, metadata: metadataCb });
+    this._bound.set(param, { value: valueCb, metadata: metadataCb, relativeValue: relativeValueCb });
   }
 
   unset(param: Parameter<any>) {
@@ -59,6 +64,24 @@ export class Synapse {
         p.__valueListeners__.forEach(l => {
           l.bind(this);
           l({ value: this._value, parameter: p });
+        });
+      } catch (ex) {
+        console.log(ex);
+      }
+    });
+
+    return this._value;
+  }
+
+  updateRelative(value: any): any {
+    this._relativeValue = value;
+    this._bound.forEach((callback, p) => {
+      try {
+        const boundCallback = callback.relativeValue?.bind(p);
+        if (boundCallback) boundCallback({ value: this._relativeValue, parameter: p });
+        p.__relativeValueListeners__.forEach(l => {
+          l.bind(this);
+          l({ value: this._relativeValue, parameter: p });
         });
       } catch (ex) {
         console.log(ex);

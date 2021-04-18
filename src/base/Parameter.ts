@@ -10,24 +10,31 @@ import { KnownParameterMetadata } from '../models/KnownParameterMetadata';
 export abstract class Parameter<T> {
   private _id: string;
   private _selfValue: (callback: ParameterValueChangeEvent<T>) => void;
+  private _selfRelativeValue: (callback: ParameterValueChangeEvent<T>) => void;
   private _selfMetadata: (callback: ParameterMetadataChangeEvent<T>) => void;
   private _default: Synapse;
   __valueListeners__: ((callback: ParameterValueChangeEvent<T>) => void)[];
+  __relativeValueListeners__: ((callback: ParameterValueChangeEvent<T>) => void)[];
   __metadataListeners__: ((callback: ParameterMetadataChangeEvent<T>) => void)[];
   private _bound: boolean;
 
-  constructor(initValue: T, id: string, valueChangeCallback?: (e: ParameterValueChangeEvent<any>) => void, metadataChangeCallback?: (e: ParameterMetadataChangeEvent<any>) => void) {
+  constructor(initValue: T, id: string, valueChangeCallback?: (e: ParameterValueChangeEvent<any>) => void, metadataChangeCallback?: (e: ParameterMetadataChangeEvent<any>) => void, relativeValueChangeCallback?: (e: ParameterValueChangeEvent<any>) => void) {
     this._id = id;
     this._selfValue = this._selfValue_;
+    this._selfRelativeValue = this._selfRelativeValue_;
     this._selfMetadata = this._selfMetadata_;
     this.__valueListeners__ = [];
     this.__metadataListeners__ = [];
+    this.__relativeValueListeners__ = [];
     this._default = Synapses.create(this, initValue);
-    this._default.set(this, this._selfValue, this._selfMetadata);
+    this._default.set(this, this._selfValue, this._selfMetadata, this._selfRelativeValue);
     this._bound = false;
 
     if (typeof valueChangeCallback == "function") {
       this.addValueListener(valueChangeCallback);
+    }
+    if (typeof relativeValueChangeCallback == "function") {
+      this.addRelativeValueListener(relativeValueChangeCallback);
     }
     if (typeof metadataChangeCallback == "function") {
       this.addMetadataListener(metadataChangeCallback);
@@ -54,6 +61,10 @@ export abstract class Parameter<T> {
     // console.log(`${callback.parameter.id()} self: new value is ${callback.parameter.value}`);
   }
 
+  private _selfRelativeValue_(callback: ParameterMetadataChangeEvent<T>) {
+    // console.log(`${callback.parameter.id()} self: new relative value is ${callback.parameter.relativeValue}`);
+  }
+
   get id(): string {
     return this._id;
   }
@@ -66,9 +77,23 @@ export abstract class Parameter<T> {
     this.doUpdate(value);
   }
 
+  get relativeValue(): T {
+    return Synapses.of(this)._relativeValue;
+  }
+
+  set relativeValue(value: T) {
+    this.doRelativeUpdate(value);
+  }
+
   private doUpdate(newValue: T, listenerUpdate: undefined | boolean = undefined): T {
     const dest = Synapses.of(this);
     const updatedValue = dest.update(newValue, listenerUpdate);
+    return updatedValue;
+  }
+
+  private doRelativeUpdate(newValue: T): T {
+    const dest = Synapses.of(this);
+    const updatedValue = dest.updateRelative(newValue);
     return updatedValue;
   }
 
@@ -126,6 +151,10 @@ export abstract class Parameter<T> {
     return this.doUpdate(newValue, listenerUpdate);
   }
 
+  updateRelative(newValue: T): T {
+    return this.doRelativeUpdate(newValue);
+  }
+
   get bound(): boolean {
     return this._bound;
   }
@@ -152,7 +181,6 @@ export abstract class Parameter<T> {
     } else {
       console.log(`${this.id} is already bound to another Synapse`);
     }
-    /* set new value to incoming parameter immediately */
   }
 
   unbind() {
@@ -175,18 +203,20 @@ export abstract class Parameter<T> {
   }
 
   addValueListener(callback: (parameterChangeEvent: ParameterValueChangeEvent<T>) => void) {
-    // const dest = Synapses.of(this);
-    // dest.add(this, callback);
     this.__valueListeners__.push(callback);
   }
+  addRelativeValueListener(callback: (parameterChangeEvent: ParameterValueChangeEvent<T>) => void) {
+    this.__relativeValueListeners__.push(callback);
+  }
   addMetadataListener(callback: (parameterChangeEvent: ParameterMetadataChangeEvent<T>) => void) {
-    // const dest = Synapses.of(this);
-    // dest.add(this, callback);
     this.__metadataListeners__.push(callback);
   }
 
   removeValueListener(callback: (parameterChangeEvent: ParameterValueChangeEvent<T>) => void) {
     this.__valueListeners__.splice(this.__valueListeners__.indexOf(callback), 1);
+  }
+  removeRelativeValueListener(callback: (parameterChangeEvent: ParameterValueChangeEvent<T>) => void) {
+    this.__relativeValueListeners__.splice(this.__relativeValueListeners__.indexOf(callback), 1);
   }
   removeMetadataListener(callback: (parameterChangeEvent: ParameterMetadataChangeEvent<T>) => void) {
     this.__metadataListeners__.splice(this.__metadataListeners__.indexOf(callback), 1);
