@@ -8,6 +8,7 @@ export enum KnownParameterMetadata {
     TOUCH_DURATION = 'TOUCH_DURATION',
     BUTTON_MODE = 'BUTTON_MODE',
     VALUE_MODE = 'VALUE_MODE',
+    VALUE_STRING = 'VALUE_STRING',
     MAX = 'MAX',
     MIN = 'MIN',
     STEP = 'STEP',

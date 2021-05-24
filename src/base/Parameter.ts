@@ -121,6 +121,12 @@ export abstract class Parameter<T> {
   set color(color: string) {
     Synapses.of(this).setMetadata(KnownParameterMetadata.COLOR, color);
   }
+  get valueString(): string {
+    return Synapses.of(this).getMetadata(KnownParameterMetadata.VALUE_STRING);
+  }
+  set valueString(valueString: string) {
+    Synapses.of(this).setMetadata(KnownParameterMetadata.VALUE_STRING, valueString);
+  }
 
   setMetadata(key: string, value: any, listenerUpdate: undefined | boolean = undefined) {
     const dest = Synapses.of(this);
