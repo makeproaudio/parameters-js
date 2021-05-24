@@ -74,7 +74,6 @@ export class SuperParameter extends Parameter<any> {
                         return true;
                     }
                 }
-                console.log("a");
                 return false;
             case ParameterType.NUMBER:
                 if (req.MAX !== undefined && req.MIN !== undefined && req.STEP !== undefined && req.VALUES === undefined) {
@@ -82,7 +81,6 @@ export class SuperParameter extends Parameter<any> {
                         return true;
                     }
                 }
-                console.log("b");
                 return false;
             case ParameterType.NUMBER_ARRAY:
                 if (req.MAX === undefined && req.MIN === undefined && req.STEP === undefined && req.VALUES !== undefined) {
@@ -92,7 +90,6 @@ export class SuperParameter extends Parameter<any> {
                         }
                     }
                 }
-                console.log("c");
                 return false;
             case ParameterType.STRING:
                 if (req.MAX === undefined && req.MIN === undefined && req.STEP === undefined && req.VALUES === undefined) {
@@ -100,7 +97,6 @@ export class SuperParameter extends Parameter<any> {
                         return true;
                     }
                 }
-                console.log("d");
                 return false;
             case ParameterType.STRING_ARRAY:
                 if (req.MAX === undefined && req.MIN === undefined && req.STEP === undefined && req.VALUES !== undefined) {
@@ -110,7 +106,6 @@ export class SuperParameter extends Parameter<any> {
                         }
                     }
                 }
-                console.log("e");
                 return false;
             // highlevel parameters
             case ParameterType.CONTINUOUS:
@@ -119,7 +114,6 @@ export class SuperParameter extends Parameter<any> {
                         return true;
                     }
                 }
-                console.log("f");
                 return false;
             case ParameterType.SELECTOR:
                 if (req.MAX === undefined && req.MIN === undefined && req.STEP === undefined && req.VALUES !== undefined) {
@@ -127,7 +121,6 @@ export class SuperParameter extends Parameter<any> {
                         return true;
                     }
                 }
-                console.log("g");
                 return false;
             case ParameterType.SWITCH:
                 if (req.MAX === undefined && req.MIN === undefined && req.STEP === undefined && req.VALUES === undefined) {
@@ -135,7 +128,6 @@ export class SuperParameter extends Parameter<any> {
                         return true;
                     }
                 }
-                console.log("h");
                 return false;
             default:
                 return false;
