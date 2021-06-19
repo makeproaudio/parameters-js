@@ -213,7 +213,7 @@ export class SuperParameter extends Parameter<any> {
         }
         if (this.type === ParameterType.BOOLEAN) this.update(!this.value, listenerUpdate);
         if (this.type == ParameterType.SWITCH) this.update(true, listenerUpdate);
-        if (this.type === ParameterType.NUMBER || this.type == ParameterType.CONTINUOUS) this.update(Math.round((this.value as number) + this.step! * jumps));
+        if (this.type === ParameterType.NUMBER || this.type == ParameterType.CONTINUOUS) this.update((this.value as number) + (this.step! * jumps), listenerUpdate);
     }
 
     updatePrevious(jumps: number, listenerUpdate: undefined | boolean = undefined): any {
@@ -225,7 +225,7 @@ export class SuperParameter extends Parameter<any> {
         }
         if (this.type === ParameterType.BOOLEAN) this.update(!this.value, listenerUpdate);
         if (this.type == ParameterType.SWITCH) this.update(false, listenerUpdate);
-        if (this.type === ParameterType.NUMBER || this.type == ParameterType.CONTINUOUS) this.update(Math.round((this.value as number) - this.step! * jumps), listenerUpdate);
+        if (this.type === ParameterType.NUMBER || this.type == ParameterType.CONTINUOUS) this.update((this.value as number) - (this.step! * jumps), listenerUpdate);
     }
 
     /* This overrides the standard update method of the Parameter by adding a few checks before making the update */
