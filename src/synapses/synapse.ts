@@ -54,10 +54,11 @@ export class Synapse {
     this._bound.delete(param);
   }
 
-  update(value: any, forceListenerUpdate?: boolean): any {
+  update(from: Parameter<any>, value: any, forceListenerUpdate?: boolean): any {
     if (forceListenerUpdate !== true) if (value === this._value) return this._value;
     this._value = value;
     this._bound.forEach((callback, p) => {
+      if (p === from) return;
       try {
         const boundCallback = callback.value?.bind(p);
         if (boundCallback) boundCallback({ value: this._value, parameter: p });

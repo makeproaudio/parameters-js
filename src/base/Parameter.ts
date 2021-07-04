@@ -87,7 +87,7 @@ export abstract class Parameter<T> {
 
   private doUpdate(newValue: T, listenerUpdate: undefined | boolean = undefined): T {
     const dest = Synapses.of(this);
-    const updatedValue = dest.update(newValue, listenerUpdate);
+    const updatedValue = dest.update(this, newValue, listenerUpdate);
     return updatedValue;
   }
 
