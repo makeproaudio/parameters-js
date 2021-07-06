@@ -58,13 +58,14 @@ export class Synapse {
     if (forceListenerUpdate !== true) if (value === this._value) return this._value;
     this._value = value;
     this._bound.forEach((callback, p) => {
-      if (p === from) return;
       try {
         const boundCallback = callback.value?.bind(p);
-        if (boundCallback) boundCallback({ value: this._value, parameter: p });
-        p.__valueListeners__.forEach(l => {
-          l.bind(this);
-          l({ value: this._value, parameter: p });
+        if (boundCallback && from !== p) boundCallback({ value: this._value, parameter: p });
+        p.__valueListeners__.forEach(({ forceOwn, callback }) => {
+          if (forceOwn || from !== p) {
+            callback.bind(this);
+            callback({ value: this._value, parameter: p });
+          }
         });
       } catch (ex) {
         console.log(ex);
@@ -74,15 +75,17 @@ export class Synapse {
     return this._value;
   }
 
-  updateRelative(value: any): any {
+  updateRelative(from: Parameter<any>, value: any): any {
     this._relativeValue = value;
     this._bound.forEach((callback, p) => {
       try {
         const boundCallback = callback.relativeValue?.bind(p);
-        if (boundCallback) boundCallback({ value: this._relativeValue, parameter: p });
-        p.__relativeValueListeners__.forEach(l => {
-          l.bind(this);
-          l({ value: this._relativeValue, parameter: p });
+        if (boundCallback && from !== p) boundCallback({ value: this._relativeValue, parameter: p });
+        p.__relativeValueListeners__.forEach(({ forceOwn, callback }) => {
+          if (forceOwn || from !== p) {
+            callback.bind(this);
+            callback({ value: this._relativeValue, parameter: p });
+          }
         });
       } catch (ex) {
         console.log(ex);
@@ -100,23 +103,25 @@ export class Synapse {
     return this._metadata;
   }
 
-  setMetadata(key: string, value: any, listenerUpdate: undefined | boolean = undefined) {
+  setMetadata(from: Parameter<any>, key: string, value: any, listenerUpdate: undefined | boolean = undefined) {
     if (this._metadata.get(key) !== value || listenerUpdate === true) {
       this._metadata.set(key, value);
       if (listenerUpdate !== false) {
         this._bound.forEach((callback, p) => {
           const boundCallback = callback.metadata?.bind(p);
-          if (boundCallback) boundCallback!({ metadataUpdated: { key, value }, parameter: p });
-          p.__metadataListeners__.forEach(l => {
-            l.bind(this);
-            l!({ metadataUpdated: { [key]: value }, parameter: p });
+          if (boundCallback && from !== p) boundCallback!({ metadataUpdated: { key, value }, parameter: p });
+          p.__metadataListeners__.forEach(({ forceOwn, callback }) => {
+            if (forceOwn || from !== p) {
+              callback.bind(this);
+              callback!({ metadataUpdated: { [key]: value }, parameter: p });
+            }
           });
         });
       }
     }
   }
 
-  setMetadataSeveral(metadata: Record<string, any>, listenerUpdate: undefined | boolean = undefined) {
+  setMetadataSeveral(from: Parameter<any>, metadata: Record<string, any>, listenerUpdate: undefined | boolean = undefined) {
     let changes = false;
     const metadataUpdated = {};
     for (const [key, value] of Object.entries(metadata)) {
@@ -131,23 +136,27 @@ export class Synapse {
     if (listenerUpdate !== false && (listenerUpdate === true || changes)) {
       this._bound.forEach((callback, p) => {
         const boundCallback = callback.metadata?.bind(p);
-        if (boundCallback) boundCallback!({ metadataUpdated, parameter: p });
-        p.__metadataListeners__.forEach(l => {
-          l.bind(this);
-          l!({ metadataUpdated, parameter: p });
+        if (boundCallback && from !== p) boundCallback!({ metadataUpdated, parameter: p });
+        p.__metadataListeners__.forEach(({ forceOwn, callback }) => {
+          if (forceOwn || from !== p) {
+            callback.bind(this);
+            callback!({ metadataUpdated, parameter: p });
+          }
         });
       });
     }
   }
 
-  removeMetadata(key: string) {
+  removeMetadata(from: Parameter<any>, key: string) {
     this._metadata.delete(key);
     this._bound.forEach((callback, p) => {
       const boundCallback = callback.metadata?.bind(p);
-      if (boundCallback) boundCallback!({ metadataRemoved: [key], parameter: p });
-      p.__metadataListeners__.forEach(l => {
-        l.bind(this);
-        l!({ metadataRemoved: [key], parameter: p });
+      if (boundCallback && from !== p) boundCallback!({ metadataRemoved: [key], parameter: p });
+      p.__metadataListeners__.forEach(({ forceOwn, callback }) => {
+        if (forceOwn || from !== p) {
+          callback.bind(this);
+          callback!({ metadataRemoved: [key], parameter: p });
+        }
       });
     });
   }

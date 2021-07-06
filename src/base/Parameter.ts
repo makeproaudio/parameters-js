@@ -13,9 +13,9 @@ export abstract class Parameter<T> {
   private _selfRelativeValue: (callback: ParameterValueChangeEvent<T>) => void;
   private _selfMetadata: (callback: ParameterMetadataChangeEvent<T>) => void;
   private _default: Synapse;
-  __valueListeners__: ((callback: ParameterValueChangeEvent<T>) => void)[];
-  __relativeValueListeners__: ((callback: ParameterValueChangeEvent<T>) => void)[];
-  __metadataListeners__: ((callback: ParameterMetadataChangeEvent<T>) => void)[];
+  __valueListeners__: { callback: (callback: ParameterValueChangeEvent<T>) => void, forceOwn: boolean }[];
+  __relativeValueListeners__: { callback: (callback: ParameterValueChangeEvent<T>) => void, forceOwn: boolean }[];
+  __metadataListeners__: { callback: (callback: ParameterMetadataChangeEvent<T>) => void, forceOwn: boolean }[];
   private _bound: boolean;
 
   constructor(initValue: T, id: string, valueChangeCallback?: (e: ParameterValueChangeEvent<any>) => void, metadataChangeCallback?: (e: ParameterMetadataChangeEvent<any>) => void, relativeValueChangeCallback?: (e: ParameterValueChangeEvent<any>) => void) {
@@ -93,7 +93,7 @@ export abstract class Parameter<T> {
 
   private doRelativeUpdate(newValue: T): T {
     const dest = Synapses.of(this);
-    const updatedValue = dest.updateRelative(newValue);
+    const updatedValue = dest.updateRelative(this, newValue);
     return updatedValue;
   }
 
@@ -101,46 +101,46 @@ export abstract class Parameter<T> {
     return Synapses.of(this).getMetadata(KnownParameterMetadata.LABEL);
   }
   set label(label: string) {
-    Synapses.of(this).setMetadata(KnownParameterMetadata.LABEL, label);
+    Synapses.of(this).setMetadata(this, KnownParameterMetadata.LABEL, label);
   }
   get context(): string {
     return Synapses.of(this).getMetadata(KnownParameterMetadata.CONTEXT);
   }
   set context(context: string) {
-    Synapses.of(this).setMetadata(KnownParameterMetadata.CONTEXT, context);
+    Synapses.of(this).setMetadata(this, KnownParameterMetadata.CONTEXT, context);
   }
   get preferredUIWidget(): any {
     return Synapses.of(this).getMetadata(KnownParameterMetadata.PREFERRED_UI_WIDGET);
   }
   set preferredUIWidget(preferredUIWidget: any) {
-    Synapses.of(this).setMetadata(KnownParameterMetadata.PREFERRED_UI_WIDGET, preferredUIWidget);
+    Synapses.of(this).setMetadata(this, KnownParameterMetadata.PREFERRED_UI_WIDGET, preferredUIWidget);
   }
   get color(): string {
     return Synapses.of(this).getMetadata(KnownParameterMetadata.COLOR);
   }
   set color(color: string) {
-    Synapses.of(this).setMetadata(KnownParameterMetadata.COLOR, color);
+    Synapses.of(this).setMetadata(this, KnownParameterMetadata.COLOR, color);
   }
   get valueString(): string {
     return Synapses.of(this).getMetadata(KnownParameterMetadata.VALUE_STRING);
   }
   set valueString(valueString: string) {
-    Synapses.of(this).setMetadata(KnownParameterMetadata.VALUE_STRING, valueString);
+    Synapses.of(this).setMetadata(this, KnownParameterMetadata.VALUE_STRING, valueString);
   }
 
   setMetadata(key: string, value: any, listenerUpdate: undefined | boolean = undefined) {
     const dest = Synapses.of(this);
-    dest.setMetadata(key, value, listenerUpdate);
+    dest.setMetadata(this, key, value, listenerUpdate);
   }
 
   setMetadataSeveral(metadata: Record<string, any>, listenerUpdate: undefined | boolean = undefined) {
     const dest = Synapses.of(this);
-    dest.setMetadataSeveral(metadata, listenerUpdate);
+    dest.setMetadataSeveral(this, metadata, listenerUpdate);
   }
 
   removeMetadata(key: string) {
     const dest = Synapses.of(this);
-    dest.removeMetadata(key);
+    dest.removeMetadata(this, key);
   }
 
   getMetadata(key: string) {
@@ -208,23 +208,23 @@ export abstract class Parameter<T> {
     }
   }
 
-  addValueListener(callback: (parameterChangeEvent: ParameterValueChangeEvent<T>) => void) {
-    this.__valueListeners__.push(callback);
+  addValueListener(callback: (parameterChangeEvent: ParameterValueChangeEvent<T>) => void, forceOwn = false) {
+    this.__valueListeners__.push({ forceOwn, callback });
   }
-  addRelativeValueListener(callback: (parameterChangeEvent: ParameterValueChangeEvent<T>) => void) {
-    this.__relativeValueListeners__.push(callback);
+  addRelativeValueListener(callback: (parameterChangeEvent: ParameterValueChangeEvent<T>) => void, forceOwn = false) {
+    this.__relativeValueListeners__.push({ forceOwn, callback });
   }
-  addMetadataListener(callback: (parameterChangeEvent: ParameterMetadataChangeEvent<T>) => void) {
-    this.__metadataListeners__.push(callback);
+  addMetadataListener(callback: (parameterChangeEvent: ParameterMetadataChangeEvent<T>) => void, forceOwn = false) {
+    this.__metadataListeners__.push({ forceOwn, callback });
   }
 
   removeValueListener(callback: (parameterChangeEvent: ParameterValueChangeEvent<T>) => void) {
-    this.__valueListeners__.splice(this.__valueListeners__.indexOf(callback), 1);
+    this.__valueListeners__.splice(this.__valueListeners__.findIndex((p) => p.callback == callback), 1);
   }
   removeRelativeValueListener(callback: (parameterChangeEvent: ParameterValueChangeEvent<T>) => void) {
-    this.__relativeValueListeners__.splice(this.__relativeValueListeners__.indexOf(callback), 1);
+    this.__relativeValueListeners__.splice(this.__relativeValueListeners__.findIndex((p) => p.callback == callback), 1);
   }
   removeMetadataListener(callback: (parameterChangeEvent: ParameterMetadataChangeEvent<T>) => void) {
-    this.__metadataListeners__.splice(this.__metadataListeners__.indexOf(callback), 1);
+    this.__metadataListeners__.splice(this.__metadataListeners__.findIndex((p) => p.callback == callback), 1);
   }
 }
