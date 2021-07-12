@@ -51,8 +51,8 @@ export class SuperParameter extends Parameter<any> {
     /* By default, a freshly constructed SuperParameter will be of type switch. This is done to 
     * channel the type updation of a SuperParameter through the TypeChangeRequest only and to keep
     the process of creation simplistic */
-    constructor(id: string, valueChangeCallback?: (e: ParameterValueChangeEvent<any>) => void, metadataChangeCallback?: (e: ParameterMetadataChangeEvent<any>) => void) {
-        super(false, id, valueChangeCallback, metadataChangeCallback);
+    constructor(id: string, valueChangeCallback?: (e: ParameterValueChangeEvent<any>) => void, forceOwnValue?: boolean, metadataChangeCallback?: (e: ParameterMetadataChangeEvent<any>) => void, forceOwnMetadata?: boolean) {
+        super(false, id, valueChangeCallback, forceOwnValue, metadataChangeCallback, forceOwnMetadata);
         this.setMetadata(KnownParameterMetadata.TYPE, ParameterType.SWITCH);
     }
 

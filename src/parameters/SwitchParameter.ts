@@ -7,8 +7,8 @@ import { KnownParameterMetadata } from '../models/KnownParameterMetadata';
 // ON -> true
 // OFF -> false
 export class SwitchParameter extends Parameter<boolean> {
-    constructor(initValue: boolean, id: string, valueChangeCallback?: (e: ParameterValueChangeEvent<any>) => void, metadataChangeCallback?: (e: ParameterMetadataChangeEvent<any>) => void) {
-        super(initValue, id, valueChangeCallback, metadataChangeCallback);
+    constructor(initValue: boolean, id: string, valueChangeCallback?: (e: ParameterValueChangeEvent<any>) => void, forceOwnValue?: boolean, metadataChangeCallback?: (e: ParameterMetadataChangeEvent<any>) => void, forceOwnMetadata?: boolean) {
+        super(initValue, id, valueChangeCallback, forceOwnValue, metadataChangeCallback, forceOwnMetadata);
         this.setMetadata(KnownParameterMetadata.TYPE, ParameterType.SWITCH);
     }
 

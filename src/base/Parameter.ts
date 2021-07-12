@@ -18,7 +18,7 @@ export abstract class Parameter<T> {
   __metadataListeners__: { callback: (callback: ParameterMetadataChangeEvent<T>) => void, forceOwn: boolean }[];
   private _bound: boolean;
 
-  constructor(initValue: T, id: string, valueChangeCallback?: (e: ParameterValueChangeEvent<any>) => void, metadataChangeCallback?: (e: ParameterMetadataChangeEvent<any>) => void, relativeValueChangeCallback?: (e: ParameterValueChangeEvent<any>) => void) {
+  constructor(initValue: T, id: string, valueChangeCallback?: (e: ParameterValueChangeEvent<any>) => void, forceOwnValue?: boolean, metadataChangeCallback?: (e: ParameterMetadataChangeEvent<any>) => void, forceOwnMetadata?: boolean, relativeValueChangeCallback?: (e: ParameterValueChangeEvent<any>) => void, forceOwnRelativeValue?: boolean) {
     this._id = id;
     this._selfValue = this._selfValue_;
     this._selfRelativeValue = this._selfRelativeValue_;
@@ -31,13 +31,13 @@ export abstract class Parameter<T> {
     this._bound = false;
 
     if (typeof valueChangeCallback == "function") {
-      this.addValueListener(valueChangeCallback);
+      this.addValueListener(valueChangeCallback, forceOwnValue);
     }
     if (typeof relativeValueChangeCallback == "function") {
-      this.addRelativeValueListener(relativeValueChangeCallback);
+      this.addRelativeValueListener(relativeValueChangeCallback, forceOwnMetadata);
     }
     if (typeof metadataChangeCallback == "function") {
-      this.addMetadataListener(metadataChangeCallback);
+      this.addMetadataListener(metadataChangeCallback, forceOwnRelativeValue);
     }
   }
 

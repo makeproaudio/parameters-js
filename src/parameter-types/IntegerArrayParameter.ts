@@ -5,8 +5,8 @@ import { ParameterType } from '../models/ParameterType';
 import { KnownParameterMetadata } from "../models/KnownParameterMetadata";
 
 export class IntegerArrayParameter extends ArrayParameter<number> {
-    constructor(initValue: number, possibleValues: number[], id: string, valueChangeCallback?: (e: ParameterValueChangeEvent<any>) => void, metadataChangeCallback?: (e: ParameterMetadataChangeEvent<any>) => void) {
-        super(initValue, possibleValues, id, valueChangeCallback, metadataChangeCallback);
+    constructor(initValue: number, possibleValues: number[], id: string, valueChangeCallback?: (e: ParameterValueChangeEvent<any>) => void, forceOwnValue?: boolean, metadataChangeCallback?: (e: ParameterMetadataChangeEvent<any>) => void, forceOwnMetadata?: boolean) {
+        super(initValue, possibleValues, id, valueChangeCallback, forceOwnValue, metadataChangeCallback, forceOwnMetadata);
         this.setMetadata(KnownParameterMetadata.TYPE, ParameterType.NUMBER_ARRAY);
     }
 

@@ -6,8 +6,8 @@ import { ParameterType } from '../models/ParameterType';
 
 export class ContinuousParameter extends Parameter<number> {
 
-    constructor(initValue: number, min: number, max: number, step: number, id: string, valueChangeCallback?: (e: ParameterValueChangeEvent<any>) => void, metadataChangeCallback?: (e: ParameterMetadataChangeEvent<any>) => void) {
-        super(initValue, id, valueChangeCallback, metadataChangeCallback);
+    constructor(initValue: number, min: number, max: number, step: number, id: string, valueChangeCallback?: (e: ParameterValueChangeEvent<any>) => void, forceOwnValue?: boolean, metadataChangeCallback?: (e: ParameterMetadataChangeEvent<any>) => void, forceOwnMetadata?: boolean) {
+        super(initValue, id, valueChangeCallback, forceOwnValue, metadataChangeCallback, forceOwnMetadata);
         this.setMetadata(KnownParameterMetadata.TYPE, ParameterType.CONTINUOUS);
         this.setMetadata(KnownParameterMetadata.STEP, step);
         this.setMetadata(KnownParameterMetadata.MAX, max);

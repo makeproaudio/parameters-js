@@ -5,8 +5,8 @@ import { ParameterBlueprint } from '../models/ParameterBlueprint';
 import { ParameterType } from '../models/ParameterType';
 
 export class SelectorParameter<T> extends Parameter<T> {
-    constructor(initValue: T, values: T[], id: string, valueChangeCallback?: (e: ParameterValueChangeEvent<any>) => void, metadataChangeCallback?: (e: ParameterMetadataChangeEvent<any>) => void) {
-        super(initValue, id, valueChangeCallback, metadataChangeCallback);
+    constructor(initValue: T, values: T[], id: string, valueChangeCallback?: (e: ParameterValueChangeEvent<any>) => void, forceOwnValue?: boolean, metadataChangeCallback?: (e: ParameterMetadataChangeEvent<any>) => void, forceOwnMetadata?: boolean) {
+        super(initValue, id, valueChangeCallback, forceOwnValue, metadataChangeCallback, forceOwnMetadata);
         this.setMetadata(KnownParameterMetadata.TYPE, ParameterType.SELECTOR);
         this.setMetadata(KnownParameterMetadata.VALUES, values);
     }
